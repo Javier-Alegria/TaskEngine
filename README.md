@@ -1,6 +1,6 @@
 # TaskEngine ⚙️ — Multi-Process Orchestration & Analytics
 
-**TaskEngine** es una aplicación Java con interfaz gráfica (GUI) desarrollada para la gestión, ejecución y monitorización visual de procesos externos del sistema operativo. Permite orquestar tareas concurrentes, gestionar flujos de entrada y salida (`stdin`, `stdout`, `stderr`), configurar pipelines entre procesos y analizar comparativas de rendimiento en ejecuciones secuenciales y paralelas.
+**TaskEngine** es una aplicación Java con interfaz gráfica desarrollada para la gestión, ejecución y monitorización visual de procesos del sistema operativo. Permite orquestar tareas concurrentes, gestionar flujos de entrada y salida (`stdin`, `stdout`, `stderr`), configurar pipelines entre procesos y analizar comparativas de rendimiento en ejecuciones secuenciales y paralelas.
 
 ---
 
