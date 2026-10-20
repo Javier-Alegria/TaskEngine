@@ -1,12 +1,8 @@
-module com.taskengine {
+module com.taskengine.taskengine {
     requires javafx.controls;
     requires javafx.fxml;
-    requires javafx.graphics;
 
-    opens com.taskengine.app to javafx.fxml;
-    exports com.taskengine.app;
 
-    // Si necesitasemos exportar los otros paquetes en el futuro para que se comuniquen:
-    // exports com.taskengine.analyzer;
-    // exports com.taskengine.benchmark;
+    opens com.taskengine.taskengine to javafx.fxml;
+    exports com.taskengine.taskengine;
 }

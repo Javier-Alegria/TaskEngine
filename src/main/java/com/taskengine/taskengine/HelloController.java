@@ -1,9 +1,9 @@
-package com.taskengine.app;
+package com.taskengine.taskengine;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 
-public class TaskEngineController {
+public class HelloController {
     @FXML
     private Label welcomeText;
 
