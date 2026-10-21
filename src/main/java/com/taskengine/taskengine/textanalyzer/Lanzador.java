@@ -24,7 +24,13 @@ public class Lanzador {
         comando.add("Palabra");
 
         ProcessBuilder pb = new ProcessBuilder(comando);
-        //configurarRedirecciones(pb, destinoOut, fOut, destinoErr, fErr, origenIn, fIn);
+
+        File ficheroSalida = new File("fichero1.txt");
+        File ficheroError = new File("ficheroError.txt");
+        File ficheroEntrada = new File("XDXDXD");
+
+        configurarRedirecciones(pb, DestinoSalida.FICHERO, ficheroSalida, DestinoSalida.FICHERO, ficheroError, OrigenEntrada.DESDE_FICHERO, ficheroEntrada );
+
         try {
             Process p = pb.start();
         } catch (IOException e) {
@@ -43,7 +49,7 @@ public class Lanzador {
      * @param stdin
      * @param ficheroStdin
      */
-    void configurarRedirecciones(ProcessBuilder pb, DestinoSalida stdout, File ficheroStdout, DestinoSalida stderr, File ficheroStderr, OrigenEntrada stdin, File ficheroStdin){
+    static void configurarRedirecciones(ProcessBuilder pb, DestinoSalida stdout, File ficheroStdout, DestinoSalida stderr, File ficheroStderr, OrigenEntrada stdin, File ficheroStdin){
         // stdout
         switch (stdout) {
             case CAPTURAR -> pb.redirectOutput(ProcessBuilder.Redirect.PIPE);

@@ -51,6 +51,19 @@
                     <target>25</target>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <mainClass>com.taskengine.taskengine.textanalyzer.TextAnalyzer</mainClass> <!-- Reemplaza por la ruta exacta de tu clase main -->
+                    <arguments>
+                        <argument>fichero.txt</argument>
+                        <argument>tal</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
