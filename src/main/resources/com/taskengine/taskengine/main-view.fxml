@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.collections.FXCollections?>
+
+
+<?import javafx.geometry.Insets?>
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.taskengine.taskengine.MainController"
+            prefWidth="1500" prefHeight="1000">
+
+    <!-- ========================================= -->
+    <!--         CABECERA (LOGO Y POCO MÁS)        -->
+    <!-- ========================================= -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="20">
+            <padding>
+                <Insets top="12" right="14" bottom="10" left="14"/>
+            </padding>
+
+            <!-- Logo -->
+            <VBox spacing="2" prefWidth="350">
+                <HBox>
+                    <Label text="TASK"/>
+                    <Label text="ENGINE"/>
+                </HBox>
+                <Label text="Multi-Process Task Engine"/>
+                <Label text="RA1 – Programación de Servicios y Procesos"/>
+            </VBox>
+        </HBox>
+    </top>
+
+    <!-- ========================================= -->
+    <!--            CONTENIDO PRINCIPAL            -->
+    <!-- ========================================= -->
+    <center>
+        <VBox spacing="11">
+            <padding>
+                <Insets right="14" left="14"/>
+            </padding>
+
+
+
+            <!-- fila 1 (Paneles 1 al 4) -->
+            <HBox spacing="11" prefHeight="230">
+                <!-- Panel 1: Selección de tarea -->
+                <VBox spacing="10" prefWidth="313" HBox.hgrow="ALWAYS">
+                    <Label text="1. SELECCIÓN DE TAREA"/>
+
+                    <Label text="Tipo de tarea:"/>
+                    <ComboBox fx:id="cmbTarea" value="Text Analyzer" maxWidth="Infinity">
+                        <items>
+                            <FXCollections fx:factory="observableArrayList">
+                                <String fx:value="Text Analyzer"/>
+                                <String fx:value="Prime Benchmark"/>
+                            </FXCollections>
+                        </items>
+                    </ComboBox>
+
+                    <Label fx:id="lblDescripcion" wrapText="true"/>
+
+                    <Region VBox.vgrow="ALWAYS"/>
+                    <Button fx:id="btnNuevaEjecucion" text="Nueva ejecución" maxWidth="Infinity"/>
+                </VBox>
+
+
+
+                <!-- Panel 2: Configuración de la ejecución -->
+                <VBox spacing="8" prefWidth="475" HBox.hgrow="ALWAYS">
+                    <Label text="2. CONFIGURACIÓN DE LA EJECUCIÓN"/>
+
+                    <!-- Bloque de Text Analyzer -->
+                    <VBox fx:id="configTextAnalyzer" spacing="8">
+                        <Label text="Fichero de entrada:"/>
+                        <HBox spacing="10">
+                            <TextField fx:id="txtFichero" promptText="C:\Ruta\del\fichero" HBox.hgrow="ALWAYS"/>
+                            <Button fx:id="btnExaminar" text="Examinar..."/>
+                        </HBox>
+                        <Label text="Palabra a buscar:"/>
+                        <TextField fx:id="txtPalabra" promptText="Palabra"/>
+                    </VBox>
+
+                    <!-- Bloque de Prime Benchmark -->
+                    <VBox fx:id="configPrimeBenchmark" spacing="8">
+                        <Label text="Límite N:"/>
+                        <TextField fx:id="txtLimiteN" promptText="Ej.: 500000"/>
+                    </VBox>
+
+                    <Region VBox.vgrow="ALWAYS"/>
+
+                    <TitledPane text="Opciones avanzadas" expanded="false">
+                        <VBox spacing="8">
+                            <!-- TODO: definir las opciones -->
+                        </VBox>
+                    </TitledPane>
+                </VBox>
+
+
+
+                <!-- Panel 3: Modo de ejecución -->
+                <VBox spacing="10" prefWidth="305" HBox.hgrow="ALWAYS">
+                    <fx:define>
+                        <ToggleGroup fx:id="grupoModo"/>
+                    </fx:define>
+
+                    <Label text="3. MODO DE EJECUCIÓN"/>
+
+                    <Label text="Modo:"/>
+                    <HBox>
+                        <ToggleButton fx:id="tglSecuencial"
+                                      text="SECUENCIAL"
+                                      toggleGroup="$grupoModo"
+                                      maxWidth="Infinity"
+                                      HBox.hgrow="ALWAYS"
+                                      onAction="#actualizarModoFooter"/>
+                        <ToggleButton fx:id="tglParalelo"
+                                      text="PARALELO"
+                                      selected="true"
+                                      toggleGroup="$grupoModo"
+                                      maxWidth="Infinity"
+                                      HBox.hgrow="ALWAYS"
+                                      onAction="#actualizarModoFooter"/>
+                    </HBox>
+
+                    <HBox spacing="12" alignment="CENTER_LEFT">
+                        <Label text="Número de procesos:"/>
+                        <Spinner fx:id="spnProcesos" min="1" max="64" initialValue="10" editable="true"/>
+                    </HBox>
+
+                    <Region VBox.vgrow="ALWAYS"/>
+                    <Button fx:id="btnIniciar" text="Iniciar ejecución" maxWidth="Infinity"/>
+                </VBox>
+
+
+
+                <!-- Panel 4: Redirecciones -->
+                <VBox spacing="10" prefWidth="340" HBox.hgrow="ALWAYS">
+                    <Label text="4. REDIRECCIONES"/>
+
+                    <GridPane hgap="10" vgap="10">
+                        <columnConstraints>
+                            <ColumnConstraints minWidth="50"/>
+                            <ColumnConstraints hgrow="ALWAYS"/>
+                        </columnConstraints>
+
+                        <Label text="stdout:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                        <ComboBox fx:id="cmbStdout" value="Capturar en la aplicación" maxWidth="Infinity"
+                                  GridPane.rowIndex="0" GridPane.columnIndex="1">
+                            <items>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="Capturar en la aplicación"/>
+                                    <String fx:value="Guardar en fichero"/>
+                                    <String fx:value="Descartar"/>
+                                </FXCollections>
+                            </items>
+                        </ComboBox>
+
+                        <Label text="stderr:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                        <ComboBox fx:id="cmbStderr" value="Capturar en la aplicación" maxWidth="Infinity"
+                                  GridPane.rowIndex="1" GridPane.columnIndex="1">
+                            <items>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="Capturar en la aplicación"/>
+                                    <String fx:value="Guardar en fichero"/>
+                                    <String fx:value="Descartar"/>
+                                </FXCollections>
+                            </items>
+                        </ComboBox>
+
+                        <Label text="stdin:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                        <ComboBox fx:id="cmbStdin" value="Desde la aplicación" maxWidth="Infinity"
+                                  GridPane.rowIndex="2" GridPane.columnIndex="1">
+                            <items>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="Desde la aplicación"/>
+                                    <String fx:value="Guardar en fichero"/>
+                                </FXCollections>
+                            </items>
+                        </ComboBox>
+                    </GridPane>
+
+                    <Region VBox.vgrow="ALWAYS"/>
+                    <Separator/>
+
+                    <TitledPane text="Redirección avanzada a archivos" expanded="false">
+                        <VBox spacing="8">
+                            <TextField fx:id="txtArchivoStdout" promptText="Archivo para stdout"/>
+                            <TextField fx:id="txtArchivoStderr" promptText="Archivo para stderr"/>
+                            <TextField fx:id="txtArchivoStdin" promptText="Archivo para stdin"/>
+                        </VBox>
+                    </TitledPane>
+                </VBox>
+            </HBox>
+
+
+
+            <!-- Panel 5: Monitor de procesos -->
+            <VBox spacing="8" VBox.vgrow="ALWAYS">
+                <Label text="5. MONITOR DE PROCESOS"/>
+
+                <TableView fx:id="tblProcesos" VBox.vgrow="ALWAYS">
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN"/>
+                    </columnResizePolicy>
+
+                    <placeholder>
+                        <Label text="No hay procesos todavía"/>
+                    </placeholder>
+
+                    <columns>
+                        <TableColumn fx:id="colId" text="ID" prefWidth="60"/>
+                        <TableColumn fx:id="colPid" text="PID" prefWidth="90"/>
+                        <TableColumn fx:id="colTarea" text="Tarea" prefWidth="160"/>
+                        <TableColumn fx:id="colParametros" text="Parámetros" prefWidth="340"/>
+                        <TableColumn fx:id="colInicio" text="Inicio" prefWidth="120"/>
+                        <TableColumn fx:id="colFin" text="Fin" prefWidth="120"/>
+                        <TableColumn fx:id="colTiempo" text="Tiempo (ms)" prefWidth="100"/>
+                        <TableColumn fx:id="colCodigoSalida" text="Código salida" prefWidth="110"/>
+                        <TableColumn fx:id="colEstado" text="Estado" prefWidth="120"/>
+                    </columns>
+                </TableView>
+            </VBox>
+
+
+
+            <!-- Fila 3: paneles 6 a 8 -->
+            <HBox spacing="11" prefHeight="205">
+
+                <!-- Panel 6: Salida estándar -->
+                <VBox spacing="8" prefWidth="397" HBox.hgrow="ALWAYS">
+                    <Label text="6. SALIDA ESTÁNDAR (stdout)"/>
+
+                    <StackPane VBox.vgrow="ALWAYS">
+                        <TextArea fx:id="txtStdout" editable="false" promptText="Salida estándar del proceso" />
+                        <Button fx:id="btnLimpiarStdout" text="Limpiar" onAction="#limpiarTexto" StackPane.alignment="BOTTOM_RIGHT">
+                            <StackPane.margin>
+                                <Insets right="10" bottom="8"/>
+                            </StackPane.margin>
+                        </Button>
+                    </StackPane>
+                </VBox>
+
+                <!-- Panel 7: Salida de error -->
+                <VBox spacing="8" prefWidth="405" HBox.hgrow="ALWAYS">
+                    <Label text="7. SALIDA DE ERROR (stderr)"/>
+
+                    <StackPane VBox.vgrow="ALWAYS">
+                        <TextArea fx:id="txtStderr" editable="false" wrapText="true" promptText="Salida de error del proceso" />
+                        <Button fx:id="btnLimpiarStderr" text="Limpiar" onAction="#limpiarTexto" StackPane.alignment="BOTTOM_RIGHT">
+                            <StackPane.margin>
+                                <Insets right="10" bottom="8"/>
+                            </StackPane.margin>
+                        </Button>
+                    </StackPane>
+                </VBox>
+
+                <!-- Panel 8: Información general -->
+                <VBox spacing="8" prefWidth="649" HBox.hgrow="ALWAYS">
+                    <Label text="8. INFORMACIÓN GENERAL"/>
+
+                    <HBox spacing="14" VBox.vgrow="ALWAYS">
+
+                        <!-- Contadores -->
+                        <GridPane hgap="16" vgap="10">
+                            <columnConstraints>
+                                <ColumnConstraints minWidth="150"/>
+                                <ColumnConstraints hgrow="ALWAYS"/>
+                            </columnConstraints>
+
+                            <Label text="Procesos ejecutados:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                            <Label fx:id="lblEjecutados" text="0" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                            <Label text="Procesos finalizados:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                            <Label fx:id="lblFinalizados" text="0" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                            <Label text="Procesos en ejecución:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                            <Label fx:id="lblEnEjecucion" text="0" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                            <Label text="Procesos con error:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                            <Label fx:id="lblConError" text="0" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                        </GridPane>
+
+                        <!-- Tiempo total, progreso y exportación -->
+                        <VBox spacing="12" HBox.hgrow="ALWAYS">
+                            <HBox spacing="12" alignment="CENTER_LEFT">
+                                <Label text="Tiempo total (lote):"/>
+                                <Label fx:id="lblTiempoTotal" text="00:00:00.000"/>
+                            </HBox>
+
+                            <HBox spacing="14" alignment="CENTER_LEFT">
+                                <ProgressBar fx:id="pgbLote" progress="0.0" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                                <Label fx:id="lblPorcentaje" text="0%"/>
+                            </HBox>
+
+                            <Button fx:id="btnExportar" text="Exportar resultados..."/>
+                        </VBox>
+                    </HBox>
+                </VBox>
+            </HBox>
+        </VBox>
+    </center>
+
+    <!-- ========================================= -->
+    <!--             BARRA TAREAS ABAJO            -->
+    <!-- ========================================= -->
+    <bottom>
+        <HBox alignment="CENTER_LEFT" spacing="70">
+            <padding>
+                <Insets top="9" right="22" bottom="9" left="22"/>
+            </padding>
+
+            <Label fx:id="lblUsuario" text="Usuario: -"/>
+            <Label fx:id="lblModo" text="Modo: PARALELO"/>
+            <Label fx:id="lblProcesos" text="Procesos: -"/>
+            <Label fx:id="lblInicio" text="Inicio: -"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label text="Task Engine v1.0"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>
