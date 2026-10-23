@@ -1,7 +1,6 @@
 package com.taskengine.taskengine.model;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ObservableValue;
 
 import java.time.Duration;
 import java.time.LocalTime;
@@ -33,10 +32,10 @@ public class Proceso {
     private final LocalTime inicio = LocalTime.now().truncatedTo(ChronoUnit.MILLIS);
 
     // Datos que cambian cuando el proceso termina
-    private final ObjectProperty<LocalTime> fin = new SimpleObjectProperty<>();
-    private final ObjectProperty<Long> tiempoMs = new SimpleObjectProperty<>();
-    private final ObjectProperty<Integer> codigoSalida = new SimpleObjectProperty<>();
-    private final ObjectProperty<Estado> estado = new SimpleObjectProperty<>(Estado.EJECUTANDO);
+    private LocalTime fin;
+    private Long tiempoMs;
+    private Integer codigoSalida;
+    private Estado estado = Estado.EJECUTANDO;
 
     public Proceso(int id, long pid, String tarea, String parametros) {
         this.id = id;
@@ -48,10 +47,10 @@ public class Proceso {
     /** Marca el proceso como terminado. La fila se conserva, solo cambian sus datos. */
     public void finalizar(int codigo) {
         LocalTime ahora = LocalTime.now().truncatedTo(ChronoUnit.MILLIS);
-        fin.set(ahora);
-        tiempoMs.set(Duration.between(inicio, ahora).toMillis());
-        codigoSalida.set(codigo);
-        estado.set(codigo == 0 ? Estado.FINALIZADO : Estado.ERROR);
+        fin = ahora;
+        tiempoMs = Duration.between(inicio, ahora).toMillis();
+        codigoSalida = codigo;
+        estado = codigo == 0 ? Estado.FINALIZADO : Estado.ERROR;
     }
 
     public int getId() { return id; }
@@ -60,8 +59,8 @@ public class Proceso {
     public String getParametros() { return parametros; }
     public LocalTime getInicio() { return inicio; }
 
-    public ObjectProperty<LocalTime> finProperty() { return fin; }
-    public ObjectProperty<Long> tiempoMsProperty() { return tiempoMs; }
-    public ObjectProperty<Integer> codigoSalidaProperty() { return codigoSalida; }
-    public ObjectProperty<Estado> estadoProperty() { return estado; }
+    public LocalTime getFin() { return fin; }
+    public Long getTiempoMs() { return tiempoMs; }
+    public Integer getCodigoSalida() { return codigoSalida; }
+    public Estado getEstado() { return estado; }
 }

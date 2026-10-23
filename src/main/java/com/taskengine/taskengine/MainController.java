@@ -7,7 +7,6 @@ import javafx.scene.layout.VBox;
 
 // Imports de clase Proceso
 import com.taskengine.taskengine.model.Proceso;
-import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -15,45 +14,54 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 //
 
+// Imports del contador de tiempo
+import javafx.animation.KeyFrame;
+import javafx.animation.PauseTransition;
+import javafx.animation.Timeline;
+import javafx.util.Duration;
+
+//
 public class MainController {
     private static final String TEXT_ANALYZER = "Text Analyzer";
     private final DateTimeFormatter formatoTiempo = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
 
+    private final ObservableList<Proceso> procesos = FXCollections.observableArrayList();
+
+    // Variables de control de procesos
+    private int procesosEjecutados = 0;
+    private int procesosFinalizados = 0;
+    private int procesosEnEjecucion = 0;
+    private int procesosConError = 0;
+    private int siguienteId = 1;
+
+    // Contador del tiempo total
+    private long inicioTiempoTotal;
+    private Timeline contadorTiempoTotal;
+
+
     // Panel 1
-    @FXML
-    private ComboBox<String> cmbTarea;
-    @FXML
-    private Label lblDescripcion;
+    @FXML private ComboBox<String> cmbTarea;
+    @FXML private Label lblDescripcion;
 
     // Panel 2
-    @FXML
-    private VBox configTextAnalyzer;
-    @FXML
-    private VBox configPrimeBenchmark;
+    @FXML private VBox configTextAnalyzer;
+    @FXML private VBox configPrimeBenchmark;
+
+    // Panel 3
+    @FXML private ToggleButton tglParalelo;
+    @FXML private Spinner<Integer> spnProcesos;
 
     // Panel 5
-    @FXML
-    private TableView<Proceso> tblProcesos;
-    @FXML
-    private TableColumn<Proceso, Integer> colId;
-    @FXML
-    private TableColumn<Proceso, Long> colPid;
-    @FXML
-    private TableColumn<Proceso, String> colTarea;
-    @FXML
-    private TableColumn<Proceso, String> colParametros;
-    @FXML
-    private TableColumn<Proceso, LocalTime> colInicio;
-    @FXML
-    private TableColumn<Proceso, LocalTime> colFin;
-    @FXML
-    private TableColumn<Proceso, Long> colTiempo;
-    @FXML
-    private TableColumn<Proceso, Integer> colCodigoSalida;
-    @FXML
-    private TableColumn<Proceso, Proceso.Estado> colEstado;
-
-    private final ObservableList<Proceso> procesos = FXCollections.observableArrayList();
+    @FXML private TableView<Proceso> tblProcesos;
+    @FXML private TableColumn<Proceso, Integer> colId;
+    @FXML private TableColumn<Proceso, Long> colPid;
+    @FXML private TableColumn<Proceso, String> colTarea;
+    @FXML private TableColumn<Proceso, String> colParametros;
+    @FXML private TableColumn<Proceso, LocalTime> colInicio;
+    @FXML private TableColumn<Proceso, LocalTime> colFin;
+    @FXML private TableColumn<Proceso, Long> colTiempo;
+    @FXML private TableColumn<Proceso, Integer> colCodigoSalida;
+    @FXML private TableColumn<Proceso, Proceso.Estado> colEstado;
 
     // Panel 6
     @FXML private TextArea txtStdout;
@@ -61,7 +69,16 @@ public class MainController {
     @FXML private Button btnLimpiarStdout;
     @FXML private Button btnLimpiarStderr;
 
-    // Barra de tareas
+    // Panel 8
+    @FXML private Label lblEjecutados;
+    @FXML private Label lblFinalizados;
+    @FXML private Label lblEnEjecucion;
+    @FXML private Label lblConError;
+    @FXML private Label lblTiempoTotal;
+    @FXML private ProgressBar pgbLote;
+    @FXML private Label lblPorcentaje;
+
+    // Barra de tareas/footer
     @FXML private Label lblUsuario;
     @FXML private Label lblModo;
     @FXML private Label lblProcesos;
@@ -75,6 +92,26 @@ public class MainController {
 
         cmbTarea.valueProperty().addListener((obs, anterior, nueva) -> actualizarTarea(nueva));
         actualizarTarea(cmbTarea.getValue());
+
+        //PROCESOS DE PRUEBA (NO SE CREAN ASÍ ES SOLO PARA PROBAR QUE LA TABLA FUNCIONA)
+        // A PARTIR DE AQUI SE BORRARÁ PARA CUANDO TENGAMOS EL MÉTDODO TEXT ANALYZER FINALIZADO
+
+        // Espera 3 segundos sin bloquear la interfaz
+        PauseTransition espera1 = new PauseTransition(Duration.seconds(3));
+
+        Proceso procesoPrueba = crearProcesoPrueba(
+                "Text Analyzer",
+                "ejemplo_texto.txt | palabra: programación"
+        );
+
+        // Espera 3 segundos sin bloquear la interfaz
+        PauseTransition espera = new PauseTransition(Duration.seconds(3));
+
+        espera.setOnFinished(evento -> {
+            terminarProceso(procesoPrueba, 0);
+        });
+
+        espera.play();
     }
 
     private void actualizarTarea(String tarea) {
@@ -90,19 +127,125 @@ public class MainController {
         }
     }
 
+    private void actualizarEstadisticas() {
+        lblEjecutados.setText("Ejectuados: " + procesosEjecutados);
+        lblFinalizados.setText("Finalizados: " + procesosFinalizados);
+        lblEnEjecucion.setText("En Ejecucion: " + procesosEnEjecucion);
+        lblConError.setText("Con Error: " + procesosConError);
+    }
+
+    private Proceso crearProcesoPrueba(String tarea, String parametros) {
+        Proceso proceso = new Proceso(
+                siguienteId,
+                1000L + siguienteId, // PID ficticio para las pruebas
+                tarea,
+                parametros
+        );
+
+        siguienteId++;
+
+        procesos.add(proceso);
+
+        procesosEjecutados++;
+        procesosEnEjecucion++;
+
+        actualizarEstadisticas();
+        iniciarContadorTiempoTotal();
+
+        return proceso;
+    }
+
+    // TODO:COMPROBAR CON LA PROFE PROBLEMA:
+    //                      NO HEMOS DADO EL TimeLine PERO ES NECESARIO PARA EL CONTADOR
+    //                      contar que lo he hecho con la IA
+    private void iniciarContadorTiempoTotal() {
+        if (contadorTiempoTotal != null) {
+            return;
+        }
+
+        inicioTiempoTotal = System.nanoTime();
+
+        contadorTiempoTotal = new Timeline(
+                new KeyFrame(Duration.millis(100), evento -> {
+                    long tiempoMs =
+                            (System.nanoTime() - inicioTiempoTotal) / 1_000_000;
+
+                    long horas = tiempoMs / 3_600_000;
+                    long minutos = (tiempoMs % 3_600_000) / 60_000;
+                    long segundos = (tiempoMs % 60_000) / 1_000;
+                    long milisegundos = tiempoMs % 1_000;
+
+                    lblTiempoTotal.setText(String.format(
+                            "Tiempo total: %02d:%02d:%02d.%03d",
+                            horas, minutos, segundos, milisegundos
+                    ));
+                })
+        );
+
+        contadorTiempoTotal.setCycleCount(Timeline.INDEFINITE);
+        contadorTiempoTotal.play();
+    }
+
+    /**
+     * Termina un proceso en ejecución
+     * @param proceso
+     * @param codigo 0 si se ha terminado correctamente | 2 si ha habido un error
+     */
+    private void terminarProceso(Proceso proceso, int codigo) {
+
+        //TODO:[IMPORTANTE] comprobar el pdf que el código de error puede ser así y no de una forma específica
+
+        // Si el proceso que se intenta terminar no está en ejecución, se termina
+        if (proceso.getEstado() != Proceso.Estado.EJECUTANDO) {
+            return;
+        }
+
+        proceso.finalizar(codigo);
+
+        procesosEnEjecucion--;
+
+        if (codigo == 0) {
+            procesosFinalizados++;
+        } else {
+            procesosConError++;
+        }
+
+        actualizarEstadisticas();
+        tblProcesos.refresh();
+    }
+
+    /**
+     * Crea un proceso, actualizando las estadísticas globales y añadiendolo a la lista de procesos lanzados por la app
+     * @param pid PID real del proceso lanzado
+     * @param tarea Texto que indica si ha sido lanzado por el text analyzer o el prime benchmark
+     * @param parametros Parámetros que han sido pasados al proceso
+     * @return //TODO
+     */
+    private Proceso crearProceso(long pid, String tarea, String parametros) { //TODO: Terminar proceso
+        Proceso process = new Proceso(siguienteId++, pid, tarea, parametros);
+        procesos.add(process);
+
+        procesosEjecutados++;
+        procesosEnEjecucion++;
+
+        //TODO:actualizarEstadisticas();
+
+        return process;
+    }
+
     private void configurarTabla() {
         tblProcesos.setItems(procesos);
 
-        colId.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(c.getValue().getId()));
-        colPid.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(c.getValue().getPid()));
-        colTarea.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(c.getValue().getTarea()));
-        colParametros.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(c.getValue().getParametros()));
-        colInicio.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(c.getValue().getInicio()));
+        colId.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().getId()));
+        colPid.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().getPid()));
+        colTarea.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().getTarea()));
+        colParametros.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().getParametros()));
+        colInicio.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().getInicio()));
 
-        colFin.setCellValueFactory(c -> c.getValue().finProperty());
-        colTiempo.setCellValueFactory(c -> c.getValue().tiempoMsProperty());
-        colCodigoSalida.setCellValueFactory(c -> c.getValue().codigoSalidaProperty());
-        colEstado.setCellValueFactory(c -> c.getValue().estadoProperty());
+        colFin.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().getFin()));
+        colTiempo.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().getTiempoMs()));
+        colCodigoSalida.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().getCodigoSalida()));
+        colEstado.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().getEstado()));
     }
 
     /**
@@ -141,6 +284,4 @@ public class MainController {
         bloque.setVisible(visible);
         bloque.setManaged(visible);
     }
-
-
 }
