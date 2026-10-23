@@ -1,0 +1,6 @@
+--- Resultado del análisis ---
+Líneas: 5
+Palabras: 6
+Caracteres: 21
+Palabra más larga: hola
+Apariciones de 'tal': 3

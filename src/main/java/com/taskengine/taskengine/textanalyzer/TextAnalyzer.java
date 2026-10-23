@@ -44,7 +44,8 @@ public class TextAnalyzer {
         } else if (args.length == 1){                                                  // -----> Modo stdin
             palabra = args[0];
             entrada = System.in;
-        } else {
+
+        } else {                                                                        //-----SE QUEDA AQUI------
             System.err.println("Uso: TextAnalyzer <ruta> <palabra>   (modo fichero)");
             System.err.println("     TextAnalyzer <palabra>          (modo stdin)");
             return ERROR_ARGUMENTOS;
