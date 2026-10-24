@@ -16,7 +16,6 @@ public class TextAnalyzer {
         System.exit(ejecutar(args));
     }
 
-
     /**
      * Metodo que recibe los parametros, los valida y llamara al metodo que tratara el texto segun esos parametros
      * @param args
@@ -45,7 +44,7 @@ public class TextAnalyzer {
             palabra = args[0];
             entrada = System.in;
 
-        } else {                                                                        //-----SE QUEDA AQUI------
+        } else {
             System.err.println("Uso: TextAnalyzer <ruta> <palabra>   (modo fichero)");
             System.err.println("     TextAnalyzer <palabra>          (modo stdin)");
             return ERROR_ARGUMENTOS;

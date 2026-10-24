@@ -1,6 +1,6 @@
 --- Resultado del análisis ---
-Líneas: 5
-Palabras: 6
-Caracteres: 21
-Palabra más larga: hola
+Líneas: 6
+Palabras: 7
+Caracteres: 27
+Palabra más larga: azrael
 Apariciones de 'tal': 3
