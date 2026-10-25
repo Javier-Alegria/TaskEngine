@@ -1,6 +1,6 @@
 --- Resultado del análisis ---
-Líneas: 6
-Palabras: 7
-Caracteres: 27
-Palabra más larga: azrael
+Líneas: 7
+Palabras: 8
+Caracteres: 37
+Palabra más larga: Mariconzon
 Apariciones de 'tal': 3

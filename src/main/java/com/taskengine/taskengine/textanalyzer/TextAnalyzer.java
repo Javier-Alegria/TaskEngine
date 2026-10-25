@@ -29,11 +29,6 @@ public class TextAnalyzer {
             File file = new File(args[0]);
             palabra = args[1];
 
-            if (!file.exists() || !file.isFile() || !file.canRead()){
-                System.err.println("No se pude abrir el fichero: " + args[0]);
-                return ERROR_FICHERO;
-            }
-
             try {
                 entrada = new FileInputStream(file);
             } catch (FileNotFoundException e) {
