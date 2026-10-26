@@ -8,7 +8,7 @@ import java.util.List;
 
 public class Lanzador {
     enum DestinoSalida { CAPTURAR, FICHERO, DISCARD }
-    enum OrigenEntrada { DESDE_DATAFORGE, FICHERO_ARGUMENTO, STDIN_FICHERO }
+    enum OrigenEntrada { DESDE_DATAFORGE, FICHERO_ARGUMENTO}
 
     static void main(String[] args) {
 
@@ -18,7 +18,7 @@ public class Lanzador {
          */
 
         //Ejemplo que representa lo que vendra desde GUI
-        OrigenEntrada oe = OrigenEntrada.STDIN_FICHERO; //Ejemplo que representa lo que vendra desde GUI
+        OrigenEntrada oe = OrigenEntrada.FICHERO_ARGUMENTO; //Ejemplo que representa lo que vendra desde GUI
 
         DestinoSalida ds = DestinoSalida.FICHERO;
 
@@ -32,15 +32,15 @@ public class Lanzador {
         comando.add("target\\classes");
         comando.add("com.taskengine.taskengine.textanalyzer.TextAnalyzer");
 
-        if (oe == OrigenEntrada.FICHERO_ARGUMENTO) {
-            comando.add("src\\datos\\fichero.txt"); //La ruta que vendra desde GUI
-            ficheroEntrada = null;
+        if (oe == OrigenEntrada.DESDE_DATAFORGE){
+            comando.add("src\\datos\\fichero.txt");
         }
+
         comando.add("tal");
 
         //Validar fichero de entrada en MODO 'STDIN_FICHERO'
         String validacionEntrada = "";
-        if (oe == OrigenEntrada.STDIN_FICHERO) {
+        if (oe == OrigenEntrada.FICHERO_ARGUMENTO) {
             validacionEntrada = comprobarFicheroEntrada(ficheroEntrada);
         }
 
@@ -53,7 +53,7 @@ public class Lanzador {
 
         ProcessBuilder pb = new ProcessBuilder(comando);
         //Los parametros de este metodo vendran desde GUI
-        configurarRedirecciones(pb, DestinoSalida.FICHERO, ficheroSalida, DestinoSalida.FICHERO, ficheroError, oe, ficheroEntrada );
+        configurarRedirecciones(pb, DestinoSalida.CAPTURAR, null, DestinoSalida.CAPTURAR, null, oe, ficheroEntrada );
 
 
         try {
@@ -126,7 +126,7 @@ public class Lanzador {
         // stdin
         switch (stdin) {
             case DESDE_DATAFORGE -> pb.redirectInput(ProcessBuilder.Redirect.PIPE);
-            case STDIN_FICHERO   -> pb.redirectInput(ficheroStdin);
+            case FICHERO_ARGUMENTO   -> pb.redirectInput(ficheroStdin);
         }
     }
 
