@@ -16,7 +16,6 @@ public class TextAnalyzer {
         System.exit(ejecutar(args));
     }
 
-
     /**
      * Metodo que recibe los parametros, los valida y llamara al metodo que tratara el texto segun esos parametros
      * @param args
@@ -30,11 +29,6 @@ public class TextAnalyzer {
             File file = new File(args[0]);
             palabra = args[1];
 
-            if (!file.exists() || !file.isFile() || !file.canRead()){
-                System.err.println("No se pude abrir el fichero: " + args[0]);
-                return ERROR_FICHERO;
-            }
-
             try {
                 entrada = new FileInputStream(file);
             } catch (FileNotFoundException e) {
@@ -44,6 +38,7 @@ public class TextAnalyzer {
         } else if (args.length == 1){                                                  // -----> Modo stdin
             palabra = args[0];
             entrada = System.in;
+
         } else {
             System.err.println("Uso: TextAnalyzer <ruta> <palabra>   (modo fichero)");
             System.err.println("     TextAnalyzer <palabra>          (modo stdin)");
