@@ -20,7 +20,6 @@ import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
 
-//
 public class MainController {
     private static final String TEXT_ANALYZER = "Text Analyzer";
     private final DateTimeFormatter formatoTiempo = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
@@ -50,6 +49,14 @@ public class MainController {
     // Panel 3
     @FXML private ToggleButton tglParalelo;
     @FXML private Spinner<Integer> spnProcesos;
+
+    // Panel 4
+    @FXML private ComboBox<String> cmbStdout;
+    @FXML private ComboBox<String> cmbStderr;
+    @FXML private ComboBox<String> cmbStdin;
+    @FXML private TextField txtArchivoStdout;
+    @FXML private TextField txtArchivoStderr;
+    @FXML private TextField txtArchivoStdin;
 
     // Panel 5
     @FXML private TableView<Proceso> tblProcesos;
@@ -84,11 +91,28 @@ public class MainController {
     @FXML private Label lblProcesos;
     @FXML private Label lblInicio;
 
+    /* TODO:
+        == REDIRECCIÓN DE ARCHIVOS (PANEL 4) ==
+            == STDOUT ==
+            == Si se selecciona Leer desde la aplicación ==
+                - Al seleccionar una fila del monitor, se debe poder consultar la salida de ese proceso en el panel de stdout (Panel 6)
+            == Si se selecciona Fichero ==
+                - El profesor debe poder abrir el fichero y comprobar su contenido. (No me queda muy claro a que se refiere o como hacerlo exactamente)
+            == Si se selecciona Discard ==
+                - En el panel de STDOUT debe salir -> "stdout → DISCARD: salida descartada"
+
+
+       == PANEL 3 MODO DE EJECUCIÓN
+            - Si se selecciona secuencial se espera a que termine un proceso para empezar el siguiente con waitFor
+            - Si se selecciona paralelo ...
+     */
+
 
     @FXML
     private void initialize() {
         configurarTabla();
         setHoraInicio();
+        actualizarArchivos();
 
         cmbTarea.valueProperty().addListener((obs, anterior, nueva) -> actualizarTarea(nueva));
         actualizarTarea(cmbTarea.getValue());
@@ -114,6 +138,22 @@ public class MainController {
         espera.play();
     }
 
+    @FXML
+    private void actualizarArchivos() {
+        boolean verStdout = "Guardar en fichero".equals(cmbStdout.getValue());
+        boolean verStderr = "Guardar en fichero".equals(cmbStderr.getValue());
+        boolean verStdin = "Leer desde fichero".equals(cmbStdin.getValue());
+
+        txtArchivoStdout.setVisible(verStdout);
+        txtArchivoStdout.setManaged(verStdout);
+
+        txtArchivoStderr.setVisible(verStderr);
+        txtArchivoStderr.setManaged(verStderr);
+
+        txtArchivoStdin.setVisible(verStdin);
+        txtArchivoStdin.setManaged(verStdin);
+    }
+
     private void actualizarTarea(String tarea) {
         boolean esTextAnalyzer = TEXT_ANALYZER.equals(tarea);
 
@@ -132,6 +172,8 @@ public class MainController {
         lblFinalizados.setText("Finalizados: " + procesosFinalizados);
         lblEnEjecucion.setText("En Ejecucion: " + procesosEnEjecucion);
         lblConError.setText("Con Error: " + procesosConError);
+        // Para el footer
+        lblProcesos.setText("Procesos: " + procesosEjecutados);
     }
 
     private Proceso crearProcesoPrueba(String tarea, String parametros) {
@@ -141,6 +183,8 @@ public class MainController {
                 tarea,
                 parametros
         );
+
+        proceso.setStdout("Línea de prueba 1\nLínea de prueba 2");
 
         siguienteId++;
 
@@ -157,7 +201,6 @@ public class MainController {
 
     // TODO:COMPROBAR CON LA PROFE PROBLEMA:
     //                      NO HEMOS DADO EL TimeLine PERO ES NECESARIO PARA EL CONTADOR
-    //                      contar que lo he hecho con la IA
     private void iniciarContadorTiempoTotal() {
         if (contadorTiempoTotal != null) {
             return;
@@ -188,7 +231,7 @@ public class MainController {
 
     /**
      * Termina un proceso en ejecución
-     * @param proceso
+     * @param proceso que queremos terminar
      * @param codigo 0 si se ha terminado correctamente | 2 si ha habido un error
      */
     private void terminarProceso(Proceso proceso, int codigo) {
@@ -228,6 +271,8 @@ public class MainController {
         procesosEjecutados++;
         procesosEnEjecucion++;
 
+
+
         //TODO:actualizarEstadisticas();
 
         return process;
@@ -246,6 +291,17 @@ public class MainController {
         colTiempo.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().getTiempoMs()));
         colCodigoSalida.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().getCodigoSalida()));
         colEstado.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().getEstado()));
+
+        tblProcesos.getSelectionModel().selectedItemProperty()
+                .addListener((obs, anterior, seleccionado) -> mostrarStdout(seleccionado));
+    }
+
+    private void mostrarStdout(Proceso proceso) {
+        if (proceso == null) {
+            txtStdout.clear();
+        } else {
+            txtStdout.setText(proceso.getStdout());
+        }
     }
 
     /**

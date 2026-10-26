@@ -130,7 +130,7 @@
 
                     <HBox spacing="12" alignment="CENTER_LEFT">
                         <Label text="Número de procesos:"/>
-                        <Spinner fx:id="spnProcesos" min="1" max="64" initialValue="10" editable="true"/>
+                        <Spinner fx:id="spnProcesos" min="1" max="100" initialValue="10" editable="true"/>
                     </HBox>
 
                     <Region VBox.vgrow="ALWAYS"/>
@@ -151,6 +151,7 @@
 
                         <Label text="stdout:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
                         <ComboBox fx:id="cmbStdout" value="Capturar en la aplicación" maxWidth="Infinity"
+                                  onAction="#actualizarArchivos"
                                   GridPane.rowIndex="0" GridPane.columnIndex="1">
                             <items>
                                 <FXCollections fx:factory="observableArrayList">
@@ -163,6 +164,7 @@
 
                         <Label text="stderr:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
                         <ComboBox fx:id="cmbStderr" value="Capturar en la aplicación" maxWidth="Infinity"
+                                  onAction="#actualizarArchivos"
                                   GridPane.rowIndex="1" GridPane.columnIndex="1">
                             <items>
                                 <FXCollections fx:factory="observableArrayList">
@@ -175,11 +177,12 @@
 
                         <Label text="stdin:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
                         <ComboBox fx:id="cmbStdin" value="Desde la aplicación" maxWidth="Infinity"
+                                  onAction="#actualizarArchivos"
                                   GridPane.rowIndex="2" GridPane.columnIndex="1">
                             <items>
                                 <FXCollections fx:factory="observableArrayList">
                                     <String fx:value="Desde la aplicación"/>
-                                    <String fx:value="Guardar en fichero"/>
+                                    <String fx:value="Leer desde fichero"/>
                                 </FXCollections>
                             </items>
                         </ComboBox>
@@ -190,9 +193,9 @@
 
                     <TitledPane text="Redirección avanzada a archivos" expanded="false">
                         <VBox spacing="8">
-                            <TextField fx:id="txtArchivoStdout" promptText="Archivo para stdout"/>
-                            <TextField fx:id="txtArchivoStderr" promptText="Archivo para stderr"/>
-                            <TextField fx:id="txtArchivoStdin" promptText="Archivo para stdin"/>
+                            <TextField fx:id="txtArchivoStdout" promptText="Ruta de archivo para stdout"/>
+                            <TextField fx:id="txtArchivoStderr" promptText="Ruta de archivo para stderr"/>
+                            <TextField fx:id="txtArchivoStdin" promptText="Ruta de archivo para stdin"/>
                         </VBox>
                     </TitledPane>
                 </VBox>
@@ -315,10 +318,10 @@
                 <Insets top="9" right="22" bottom="9" left="22"/>
             </padding>
 
-            <Label fx:id="lblUsuario" text="Usuario: -"/>
+            <Label fx:id="lblUsuario" text="Usuario: Alumno"/>
             <Label fx:id="lblModo" text="Modo: PARALELO"/>
             <Label fx:id="lblProcesos" text="Procesos: -"/>
-            <Label fx:id="lblInicio" text="Inicio: -"/>
+            <Label fx:id="lblInicio"/>
 
             <Region HBox.hgrow="ALWAYS"/>
             <Label text="Task Engine v1.0"/>

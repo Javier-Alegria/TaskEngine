@@ -37,6 +37,8 @@ public class Proceso {
     private Integer codigoSalida;
     private Estado estado = Estado.EJECUTANDO;
 
+    private String stdout = "";
+
     public Proceso(int id, long pid, String tarea, String parametros) {
         this.id = id;
         this.pid = pid;
@@ -63,4 +65,10 @@ public class Proceso {
     public Long getTiempoMs() { return tiempoMs; }
     public Integer getCodigoSalida() { return codigoSalida; }
     public Estado getEstado() { return estado; }
+
+    public String getStdout() { return stdout; }
+
+    public void setStdout(String texto) { stdout = texto; }
+
+    public void agregarStdout(String linea) { stdout += linea + "\n"; }
 }
