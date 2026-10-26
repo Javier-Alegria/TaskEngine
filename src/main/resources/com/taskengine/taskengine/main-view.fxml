@@ -77,11 +77,20 @@
 
                     <!-- Bloque de Text Analyzer -->
                     <VBox fx:id="configTextAnalyzer" spacing="8">
-                        <Label text="Fichero de entrada:"/>
-                        <HBox spacing="10">
-                            <TextField fx:id="txtFichero" promptText="C:\Ruta\del\fichero" HBox.hgrow="ALWAYS"/>
-                            <Button fx:id="btnExaminar" text="Examinar..."/>
-                        </HBox>
+                        <!-- Modo fichero (stdin = "Leer desde fichero"): la ruta va como argumento -->
+                        <VBox fx:id="cajaFichero" spacing="8">
+                            <Label text="Fichero de entrada:"/>
+                            <HBox spacing="10">
+                                <TextField fx:id="txtFichero" promptText="C:\Ruta\del\fichero" HBox.hgrow="ALWAYS"/>
+                                <Button fx:id="btnExaminar" text="Examinar..." onAction="#examinarFichero"/>
+                            </HBox>
+                        </VBox>
+                        <!-- Modo stdin (stdin = "Desde la aplicación"): texto enviado con getOutputStream() -->
+                        <VBox fx:id="cajaTextoStdin" spacing="8">
+                            <Label text="Texto a enviar por stdin:"/>
+                            <TextArea fx:id="txtTextoStdin" prefRowCount="3" wrapText="true"
+                                      promptText="Escribe aquí el texto que analizará Text Analyzer"/>
+                        </VBox>
                         <Label text="Palabra a buscar:"/>
                         <TextField fx:id="txtPalabra" promptText="Palabra"/>
                     </VBox>
@@ -134,7 +143,7 @@
                     </HBox>
 
                     <Region VBox.vgrow="ALWAYS"/>
-                    <Button fx:id="btnIniciar" text="Iniciar ejecución" maxWidth="Infinity"/>
+                    <Button fx:id="btnIniciar" text="Iniciar ejecución" maxWidth="Infinity" onAction="#iniciarEjecucion"/>
                 </VBox>
 
 
@@ -151,7 +160,7 @@
 
                         <Label text="stdout:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
                         <ComboBox fx:id="cmbStdout" value="Capturar en la aplicación" maxWidth="Infinity"
-                                  onAction="#actualizarArchivos"
+                                  onAction="#cambiarRedireccion"
                                   GridPane.rowIndex="0" GridPane.columnIndex="1">
                             <items>
                                 <FXCollections fx:factory="observableArrayList">
@@ -164,7 +173,7 @@
 
                         <Label text="stderr:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
                         <ComboBox fx:id="cmbStderr" value="Capturar en la aplicación" maxWidth="Infinity"
-                                  onAction="#actualizarArchivos"
+                                  onAction="#cambiarRedireccion"
                                   GridPane.rowIndex="1" GridPane.columnIndex="1">
                             <items>
                                 <FXCollections fx:factory="observableArrayList">
@@ -177,7 +186,7 @@
 
                         <Label text="stdin:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
                         <ComboBox fx:id="cmbStdin" value="Desde la aplicación" maxWidth="Infinity"
-                                  onAction="#actualizarArchivos"
+                                  onAction="#cambiarRedireccion"
                                   GridPane.rowIndex="2" GridPane.columnIndex="1">
                             <items>
                                 <FXCollections fx:factory="observableArrayList">
@@ -191,11 +200,10 @@
                     <Region VBox.vgrow="ALWAYS"/>
                     <Separator/>
 
-                    <TitledPane text="Redirección avanzada a archivos" expanded="false">
+                    <TitledPane fx:id="tpRedirecciones" text="Redirección avanzada a archivos" expanded="false">
                         <VBox spacing="8">
                             <TextField fx:id="txtArchivoStdout" promptText="Ruta de archivo para stdout"/>
                             <TextField fx:id="txtArchivoStderr" promptText="Ruta de archivo para stderr"/>
-                            <TextField fx:id="txtArchivoStdin" promptText="Ruta de archivo para stdin"/>
                         </VBox>
                     </TitledPane>
                 </VBox>
@@ -205,7 +213,11 @@
 
             <!-- Panel 5: Monitor de procesos -->
             <VBox spacing="8" VBox.vgrow="ALWAYS">
-                <Label text="5. MONITOR DE PROCESOS"/>
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="5. MONITOR DE PROCESOS"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button fx:id="btnDetener" text="Detener ejecución" onAction="#detenerEjecucion"/>
+                </HBox>
 
                 <TableView fx:id="tblProcesos" VBox.vgrow="ALWAYS">
                     <columnResizePolicy>
@@ -329,3 +341,4 @@
     </bottom>
 
 </BorderPane>
+
