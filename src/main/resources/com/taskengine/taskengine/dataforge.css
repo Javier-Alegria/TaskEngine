@@ -1,0 +1,232 @@
+/* === TEMA GENERAL (Claro, Minimalista y con contraste) === */
+.root {
+    -fx-background-color: #E2E8F0; /* Fondo general de la aplicación (gris suave) */
+    -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+    -fx-text-fill: #334155;
+}
+
+/* Textos generales por defecto */
+.label {
+    -fx-text-fill: #334155;
+}
+
+/* === Cabecera === */
+.top {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #CBD5E1;
+    -fx-border-width: 0 0 2 0;
+}
+
+.top .label {
+    -fx-text-fill: #334155;
+}
+
+.top .label:first-child {
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+    -fx-text-fill: #059669;
+}
+
+/* === PANELES (Tarjetas blancas diferenciadas del fondo general) === */
+.center VBox > VBox,
+.center VBox > HBox > VBox {
+    -fx-background-color: #FFFFFF; /* Fondo blanco puro para que se distingan claramente */
+    -fx-background-radius: 10px;
+    -fx-padding: 14px;
+    -fx-border-color: #CBD5E1;     /* Borde sutil y elegante */
+    -fx-border-radius: 10px;
+    -fx-border-width: 1.5px;
+}
+
+/* Títulos principales de cada sección (Del 1 al 8) en color Verde Esmeralda */
+.center VBox > VBox > .label:first-child,
+.center VBox > HBox > VBox > .label:first-child {
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-text-fill: #059669; /* Verde distintivo */
+    -fx-border-color: #E2E8F0;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 0 0 5px 0;
+}
+
+/* Resto de etiquetas de texto secundarias dentro de los paneles */
+.center .label {
+    -fx-font-weight: 500;
+}
+
+/* === Botones === */
+.button {
+    -fx-background-color: #F1F5F9;
+    -fx-text-fill: #334155;
+    -fx-background-radius: 6px;
+    -fx-cursor: hand;
+    -fx-font-weight: bold;
+    -fx-padding: 6px 14px;
+    -fx-border-color: #94A3B8;
+    -fx-border-radius: 6px;
+}
+
+.button:hover {
+    -fx-background-color: #E2E8F0;
+    -fx-border-color: #64748B;
+}
+
+.button:pressed {
+    -fx-background-color: #CBD5E1;
+}
+
+/* Botón principal de inicio de ejecución (Destacado en Esmeralda) */
+#btnIniciar {
+    -fx-background-color: #059669;
+    -fx-text-fill: #FFFFFF;
+    -fx-border-color: #047857;
+}
+
+#btnIniciar:hover {
+    -fx-background-color: #10B981;
+}
+
+/* Botones específicos secundarios o de limpieza */
+#btnLimpiarStdout, #btnLimpiarStderr, #btnExaminar, #btnExportar, #btnDetener {
+    -fx-background-color: #F1F5F9;
+    -fx-text-fill: #475569;
+}
+
+#btnLimpiarStdout:hover, #btnLimpiarStderr:hover, #btnExaminar:hover, #btnExportar:hover, #btnDetener:hover {
+    -fx-background-color: #E2E8F0;
+    -fx-text-fill: #0F172A;
+}
+
+/* ToggleButtons (Modo Secuencial / Paralelo) */
+.toggle-button {
+    -fx-background-color: #F1F5F9;
+    -fx-text-fill: #475569;
+    -fx-background-radius: 4px;
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 4px;
+}
+
+.toggle-button:selected {
+    -fx-background-color: #059669;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: bold;
+    -fx-border-color: #047857;
+}
+
+/* === Desplegables y Campos de Texto === */
+.combo-box, .text-field, .text-area, .spinner {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #0F172A;
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+.combo-box .list-cell {
+    -fx-text-fill: #0F172A;
+    -fx-background-color: #FFFFFF;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #CBD5E1;
+}
+
+.combo-box-popup .list-view .list-cell:hover {
+    -fx-background-color: #059669;
+    -fx-text-fill: #FFFFFF;
+}
+
+.text-field:focused, .text-area:focused, .combo-box:focused, .spinner:focused {
+    -fx-border-color: #059669;
+    -fx-border-width: 1.5px;
+}
+
+.text-area .content {
+    -fx-background-color: #FFFFFF;
+}
+
+/* === Tabla y áreas de texto === */
+.table-view {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-border-width: 1.5px;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #F8FAFC;
+    -fx-border-color: #CBD5E1;
+    -fx-border-width: 0 0 1 0;
+}
+
+.table-view .column-header, .table-view .filler {
+    -fx-background-color: transparent;
+    -fx-text-fill: #475569;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #059669;
+    -fx-font-weight: bold;
+}
+
+.table-row-cell {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #334155;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #F8FAFC;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #E6F4EA;
+    -fx-text-fill: #065F46;
+}
+
+.table-cell {
+    -fx-text-fill: #334155;
+}
+
+/* Progress Bar */
+.progress-bar .track {
+    -fx-background-color: #E2E8F0;
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+}
+
+.progress-bar .bar {
+    -fx-background-color: #059669;
+    -fx-background-radius: 4px;
+}
+
+/* TitledPane avanzado */
+.titled-pane {
+    -fx-text-fill: #334155;
+}
+
+.titled-pane > .title {
+    -fx-background-color: #F1F5F9;
+    -fx-background-radius: 5px;
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 5px;
+}
+
+.titled-pane > .content {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #CBD5E1;
+}
+
+/* === Barra de estados === */
+.bottom {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #CBD5E1;
+    -fx-border-width: 2 0 0 0;
+}
+
+.bottom .label {
+    -fx-text-fill: #475569;
+    -fx-font-size: 12px;
+}

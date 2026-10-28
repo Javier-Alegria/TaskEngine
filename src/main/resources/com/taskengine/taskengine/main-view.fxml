@@ -8,12 +8,20 @@
 
 <?import javafx.collections.FXCollections?>
 
-
 <?import javafx.geometry.Insets?>
+
+<!-- Para el css -->
+<?import java.net.URL?>
+
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.taskengine.taskengine.MainController"
             prefWidth="1500" prefHeight="1000">
+
+    <!-- Para el css -->
+    <stylesheets>
+        <URL value="@dataforge.css"/>
+    </stylesheets>
 
     <!-- ========================================= -->
     <!--         CABECERA (LOGO Y POCO MÁS)        -->
@@ -44,8 +52,6 @@
             <padding>
                 <Insets right="14" left="14"/>
             </padding>
-
-
 
             <!-- fila 1 (Paneles 1 al 4) -->
             <HBox spacing="11" prefHeight="230">
