@@ -64,9 +64,6 @@
                     </ComboBox>
 
                     <Label fx:id="lblDescripcion" wrapText="true"/>
-
-                    <Region VBox.vgrow="ALWAYS"/>
-                    <Button fx:id="btnNuevaEjecucion" text="Nueva ejecución" maxWidth="Infinity"/>
                 </VBox>
 
 
@@ -75,16 +72,17 @@
                 <VBox spacing="8" prefWidth="475" HBox.hgrow="ALWAYS">
                     <Label text="2. CONFIGURACIÓN DE LA EJECUCIÓN"/>
 
+                    <!-- Modo fichero (stdin = "Leer desde fichero"): la ruta va como argumento -->
+                    <VBox fx:id="cajaFichero" spacing="8">
+                        <Label text="Fichero de entrada:"/>
+                        <HBox spacing="10">
+                            <TextField fx:id="txtFichero" promptText="C:\Ruta\del\fichero" HBox.hgrow="ALWAYS"/>
+                            <Button fx:id="btnExaminar" text="Examinar..." onAction="#examinarFichero"/>
+                        </HBox>
+                    </VBox>
+
                     <!-- Bloque de Text Analyzer -->
                     <VBox fx:id="configTextAnalyzer" spacing="8">
-                        <!-- Modo fichero (stdin = "Leer desde fichero"): la ruta va como argumento -->
-                        <VBox fx:id="cajaFichero" spacing="8">
-                            <Label text="Fichero de entrada:"/>
-                            <HBox spacing="10">
-                                <TextField fx:id="txtFichero" promptText="C:\Ruta\del\fichero" HBox.hgrow="ALWAYS"/>
-                                <Button fx:id="btnExaminar" text="Examinar..." onAction="#examinarFichero"/>
-                            </HBox>
-                        </VBox>
                         <!-- Modo stdin (stdin = "Desde la aplicación"): texto enviado con getOutputStream() -->
                         <VBox fx:id="cajaTextoStdin" spacing="8">
                             <Label text="Texto a enviar por stdin:"/>
@@ -97,17 +95,10 @@
 
                     <!-- Bloque de Prime Benchmark -->
                     <VBox fx:id="configPrimeBenchmark" spacing="8">
+                        <!-- Modo stdin (stdin = "Desde la aplicación") -->
                         <Label text="Límite N:"/>
                         <TextField fx:id="txtLimiteN" promptText="Ej.: 500000"/>
                     </VBox>
-
-                    <Region VBox.vgrow="ALWAYS"/>
-
-                    <TitledPane text="Opciones avanzadas" expanded="false">
-                        <VBox spacing="8">
-                            <!-- TODO: definir las opciones -->
-                        </VBox>
-                    </TitledPane>
                 </VBox>
 
 

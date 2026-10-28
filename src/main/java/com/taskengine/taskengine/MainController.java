@@ -1,9 +1,9 @@
 package com.taskengine.taskengine;
 
-import com.taskengine.taskengine.textanalyzer.Lanzador;
-import com.taskengine.taskengine.textanalyzer.Lanzador.DestinoSalida;
-import com.taskengine.taskengine.textanalyzer.Lanzador.Estado;
-import com.taskengine.taskengine.textanalyzer.Lanzador.OrigenEntrada;
+import com.taskengine.taskengine.Lanzador.Lanzador;
+import com.taskengine.taskengine.Lanzador.Lanzador.DestinoSalida;
+import com.taskengine.taskengine.Lanzador.Lanzador.Estado;
+import com.taskengine.taskengine.Lanzador.Lanzador.OrigenEntrada;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -19,6 +19,8 @@ import javafx.util.Duration;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayDeque;
@@ -148,14 +150,12 @@ public class MainController {
             return;
         }
 
-        if (!TEXT_ANALYZER.equals(cmbTarea.getValue())) {
-            avisar("Prime Benchmark todavía no está implementado.");   // TODO: Lanzador.primeBenchmark(...)
-            return;
-        }
+        boolean esTextAnalyzer = TEXT_ANALYZER.equals(cmbTarea.getValue());
+        String limiteN = txtLimiteN.getText().trim();
 
         // ---------- 1. Leer la configuración de la GUI ----------
         String palabra = txtPalabra.getText().trim();
-        if (palabra.isEmpty()) {
+        if (esTextAnalyzer && palabra.isEmpty()) {
             avisar("Escribe la palabra a buscar.");
             return;
         }
@@ -171,6 +171,7 @@ public class MainController {
         }
         // OJO: no se comprueba si el fichero existe. Eso lo hace TextAnalyzer (stderr + código 2).
 
+
         DestinoSalida destinoOut = destinoDe(cmbStdout.getValue());
         DestinoSalida destinoErr = destinoDe(cmbStderr.getValue());
         File ficheroOut = ficheroDe(txtArchivoStdout);
@@ -184,7 +185,11 @@ public class MainController {
         loteActual.clear();
         colaSecuencial.clear();
         for (int i = 0; i < n; i++) {
-            Lanzador l = Lanzador.textAnalyzer(siguienteId, entrada, ruta, txtTextoStdin.getText(), palabra);
+
+            Lanzador l = esTextAnalyzer
+                    ? Lanzador.textAnalyzer(siguienteId, entrada, ruta, txtTextoStdin.getText(), palabra)
+                    : Lanzador.primeBenchmark(siguienteId, entrada, ruta, limiteN);
+
             l.setRedirecciones(destinoOut, ficheroOut, destinoErr, ficheroErr);
 
             if (i == 0) {   // todas tienen la misma configuración: basta con validar la primera
@@ -425,19 +430,24 @@ public class MainController {
         // Panel 2: en modo fichero se pide la ruta; en modo stdin, el texto a enviar
         mostrar(cajaFichero, modoFichero);
         mostrar(cajaTextoStdin, !modoFichero);
+
+        // Límite N: solo con Prime Benchmark y stdin "Desde la aplicación"
+        boolean esTextAnalyzer = TEXT_ANALYZER.equals(cmbTarea.getValue());
+        mostrar(configPrimeBenchmark, !esTextAnalyzer && !modoFichero);
     }
 
     private void actualizarTarea(String tarea) {
         boolean esTextAnalyzer = TEXT_ANALYZER.equals(tarea);
 
         mostrar(configTextAnalyzer, esTextAnalyzer);
-        mostrar(configPrimeBenchmark, !esTextAnalyzer);
 
         if (esTextAnalyzer) {
             lblDescripcion.setText("Analiza un fichero de texto y devuelve estadísticas por la salida estándar.");
         } else {
             lblDescripcion.setText("Calcula los números primos hasta N y mide el tiempo de ejecución.");
         }
+
+        actualizarArchivos();
     }
 
     private DestinoSalida destinoDe(String opcion) {

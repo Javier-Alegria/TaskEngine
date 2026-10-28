@@ -1,6 +1,0 @@
---- Resultado del análisis ---
-Líneas: 7
-Palabras: 8
-Caracteres: 37
-Palabra más larga: Mariconzon
-Apariciones de 'tal': 3

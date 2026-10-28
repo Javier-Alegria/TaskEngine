@@ -1,10 +1,9 @@
-package com.taskengine.taskengine.textanalyzer;
+package com.taskengine.taskengine.Lanzador;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import com.taskengine.taskengine.primebenchmark.PrimeBenchmark;
+import com.taskengine.taskengine.textanalyzer.TextAnalyzer;
+
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -106,7 +105,27 @@ public class Lanzador {
         return new Lanzador(id, "Text Analyzer", parametros, comando, entrada, textoStdin);
     }
 
-    // TODO: public static Lanzador primeBenchmark(int id, long n) { ... } cuando esté la clase PrimeBenchmark
+    /**
+     * Crea una ejecución de Prime Benchmark.
+     *  - Desde la aplicación: PrimeBenchmark <N>
+     *  - Desde fichero:       PrimeBenchmark -f <ruta>
+     */
+    public static Lanzador primeBenchmark(int id, OrigenEntrada entrada, String ruta, String n) {
+        List<String> comando = comandoJava(PrimeBenchmark.class);
+        String parametros;
+
+        if (entrada == OrigenEntrada.FICHERO_ARGUMENTO) {
+            comando.add("-f");
+            comando.add(ruta);
+            parametros = "N=" + primeraLinea(ruta);
+        } else {
+            comando.add(n);
+            parametros = "N=" + n;
+        }
+
+        // Prime Benchmark no lee stdin: iniciar() lo cierra al lanzar
+        return new Lanzador(id, "Prime Benchmark", parametros, comando, entrada, null);
+    }
 
     /**
      * Comando base para ejecutar una clase Java del proyecto como proceso independiente:
@@ -203,10 +222,10 @@ public class Lanzador {
     }
 
     /**
-     * Comprueba el proceso SIN bloquear. El controlador la llama periódicamente.
+     * Comprueba el proceso sin bloquear. El controlador la llama periódicamente.
      *  - Lee lo que haya disponible en stdout/stderr (si se capturan).
      *  - Si el proceso ha terminado, lee lo que quede, guarda código, fin, duración y estado.
-     * @return true justo en la llamada en la que se detecta que el proceso ha terminado
+     * @return True justo en la llamada en la que se detecta que el proceso ha terminado
      */
     public boolean actualizar() {
         if (estado != Estado.EJECUTANDO) return false;
@@ -286,6 +305,19 @@ public class Lanzador {
             return "No se puede crear el fichero en " + carpeta.getAbsolutePath();
         }
         return null;
+    }
+
+    /**
+     * Primera línea de un fichero, solo para mostrarla en la columna Parámetros.
+     * Si no se puede leer devuelve "?": el error ya lo cuenta PrimeBenchmark por stderr.
+     */
+    private static String primeraLinea(String ruta) {
+        try (BufferedReader lector = new BufferedReader(new FileReader(ruta, StandardCharsets.UTF_8))) {
+            String linea = lector.readLine();
+            return (linea == null) ? "?" : linea.trim();
+        } catch (IOException e) {
+            return "?";
+        }
     }
 
     private static LocalTime ahora() {

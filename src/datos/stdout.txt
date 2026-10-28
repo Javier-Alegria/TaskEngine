@@ -1,0 +1,6 @@
+--- Resultado del análisis ---
+Líneas: 6
+Palabras: 9
+Caracteres: 35
+Palabra más larga: azrael
+Apariciones de 'tal': 3

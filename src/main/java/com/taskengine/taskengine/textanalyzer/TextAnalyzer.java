@@ -25,7 +25,7 @@ public class TextAnalyzer {
         String palabra;
         InputStream entrada;
 
-        if (args.length == 2){                                                         // ----> Modo Fichero
+        if (args.length == 2){ // ----> Modo Fichero
             File file = new File(args[0]);
             palabra = args[1];
 
@@ -35,7 +35,7 @@ public class TextAnalyzer {
                 System.err.println("No se pudo abrir el fichero: " + args[0]);
                 return ERROR_FICHERO;
             }
-        } else if (args.length == 1){                                                  // -----> Modo stdin
+        } else if (args.length == 1){ // -----> Modo stdin
             palabra = args[0];
             entrada = System.in;
 
