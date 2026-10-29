@@ -62,6 +62,7 @@ public class PrimeBenchmark {
         int totalPrimos = contarPrimos(n);
 
         // Imprime la cantidad de primos
+        System.out.println("N: " + n);
         System.out.println("cantidad de primos: " + totalPrimos);
         return OK;
     }

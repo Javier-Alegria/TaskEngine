@@ -1,6 +1,6 @@
 --- Resultado del análisis ---
-Líneas: 6
-Palabras: 9
-Caracteres: 35
-Palabra más larga: azrael
-Apariciones de 'tal': 3
+Líneas: 1
+Palabras: 12
+Caracteres: 97
+Palabra más larga: enablenativeaccessjavafxgraphics
+Apariciones de 'WARNING': 2

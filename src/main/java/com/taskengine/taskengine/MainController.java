@@ -30,6 +30,7 @@ import java.util.List;
 
 public class MainController {
     private static final String TEXT_ANALYZER = "Text Analyzer";
+    private static final String PRIME_BENCHMARK = "Prime Benchmark";
 
     // Textos de los ComboBox del panel 4 (deben coincidir con main-view.fxml)
     private static final String OPCION_CAPTURAR = "Capturar en la aplicación";
@@ -60,6 +61,9 @@ public class MainController {
 
     // Comprobación periódica de los procesos (sin hilos: se ejecuta en el hilo de JavaFX)
     private Timeline monitor;
+
+    //Numero limite de primeBenchmark
+    String limiteN;
 
     // Panel 1
     @FXML private ComboBox<String> cmbTarea;
@@ -142,7 +146,7 @@ public class MainController {
     //                         LANZAR EJECUCIONES
     // =====================================================================
 
-    /** Botón "Iniciar ejecución" (panel 3). */
+    /** Boton "Iniciar ejecucion" (panel 3). */
     @FXML
     private void iniciarEjecucion() {
         if (hayLoteEnCurso()) {
@@ -150,26 +154,32 @@ public class MainController {
             return;
         }
 
-        boolean esTextAnalyzer = TEXT_ANALYZER.equals(cmbTarea.getValue());
-        String limiteN = txtLimiteN.getText().trim();
+        // ====================================================================
+        String tarea = cmbTarea.getValue();
+        String errorGUI = validarConfiguracion(tarea);
+        if (errorGUI != null) {
+            avisar(errorGUI);
+            return;
+        }
+        limiteN = txtLimiteN.getText().trim();
 
         // ---------- 1. Leer la configuración de la GUI ----------
         String palabra = txtPalabra.getText().trim();
-        if (esTextAnalyzer && palabra.isEmpty()) {
+        if (tarea.equals(TEXT_ANALYZER) && palabra.isEmpty()) {
             avisar("Escribe la palabra a buscar.");
             return;
         }
 
+        // ====================================================================
         OrigenEntrada entrada = STDIN_FICHERO.equals(cmbStdin.getValue())
-                ? OrigenEntrada.FICHERO_ARGUMENTO
-                : OrigenEntrada.DESDE_DATAFORGE;
+                ? OrigenEntrada.FICHERO_ARGUMENTO : OrigenEntrada.DESDE_DATAFORGE;
 
         String ruta = txtFichero.getText().trim();
         if (entrada == OrigenEntrada.FICHERO_ARGUMENTO && ruta.isEmpty()) {
             avisar("Indica el fichero de entrada (o elige stdin \"" + STDIN_APLICACION + "\").");
             return;
         }
-        // OJO: no se comprueba si el fichero existe. Eso lo hace TextAnalyzer (stderr + código 2).
+        // No se comprueba si el fichero existe. Eso lo hace TextAnalyzer (stderr + código 2).
 
 
         DestinoSalida destinoOut = destinoDe(cmbStdout.getValue());
@@ -186,10 +196,7 @@ public class MainController {
         colaSecuencial.clear();
         for (int i = 0; i < n; i++) {
 
-            Lanzador l = esTextAnalyzer
-                    ? Lanzador.textAnalyzer(siguienteId, entrada, ruta, txtTextoStdin.getText(), palabra)
-                    : Lanzador.primeBenchmark(siguienteId, entrada, ruta, limiteN);
-
+            Lanzador l = crearLanzador(tarea, siguienteId);
             l.setRedirecciones(destinoOut, ficheroOut, destinoErr, ficheroErr);
 
             if (i == 0) {   // todas tienen la misma configuración: basta con validar la primera
@@ -247,6 +254,19 @@ public class MainController {
             }
             // Si estaba cancelado o no se pudo lanzar, se pasa al siguiente
         }
+    }
+
+    private Lanzador crearLanzador(String tarea, int id){
+        OrigenEntrada entrada = STDIN_FICHERO.equals(cmbStdin.getValue())
+                ? OrigenEntrada.FICHERO_ARGUMENTO
+                : OrigenEntrada.DESDE_DATAFORGE;
+
+        if (PRIME_BENCHMARK.equals(tarea)) {
+            return Lanzador.primeBenchmark(id,entrada,txtFichero.getText().trim(),limiteN);
+        }
+
+        return Lanzador.textAnalyzer(id,entrada, txtFichero.getText().trim(),
+                txtTextoStdin.getText(),txtPalabra.getText().trim());
     }
 
     // =====================================================================
@@ -308,6 +328,24 @@ public class MainController {
         return loteActual.stream().anyMatch(l -> !l.estaTerminado());
     }
 
+
+    private String validarConfiguracion(String tarea){
+        if (TEXT_ANALYZER.equals(tarea) ) {
+            if (txtPalabra.getText().trim().isEmpty()){
+                return "Escribe la palabra a buscar";
+            }
+
+            if (STDIN_FICHERO.equals(cmbStdin.getValue()) & txtFichero.getText().trim().isEmpty() ){
+                return "Indica el fichero de entrada (Desde aplicacion)";
+            }
+        }else if(PRIME_BENCHMARK.equals(tarea)){
+            if (txtLimiteN.getText().trim().isEmpty()){
+                return "Escribe el límite N";
+            }
+        }
+        return null;
+    }
+
     // =====================================================================
     //                      DETENER (Process.destroy())
     // =====================================================================
@@ -365,6 +403,7 @@ public class MainController {
             case CAPTURAR -> capturado;
             case FICHERO -> canal + " → FICHERO: salida guardada en\n" + fichero.getAbsolutePath();
             case DISCARD -> canal + " → DISCARD: salida descartada";
+            case TUBERIA -> canal + " → TUBERÍA: salida enviada por el pipe a la entrada estándar de Text Analyzer";
         };
     }
 
