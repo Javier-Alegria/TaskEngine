@@ -1,22 +1,52 @@
 /* ==========================================================================
-   1. TEMA GENERAL Y CONFIGURACIÓN BASE
-   ================================================================---------- */
+   1. TEMA GENERAL Y VARIABLES (claro por defecto, .noche para modo noche)
+   ========================================================================== */
 .root {
-    -fx-background-color: #E2E8F0;
+    -color-fondo: #E2E8F0;
+    -color-superficie: #FFFFFF;
+    -color-suave: #F1F5F9;
+    -color-suave-hover: #E2E8F0;
+    -color-borde: #CBD5E1;
+    -color-borde-fuerte: #94A3B8;
+    -color-borde-hover: #64748B;
+    -color-texto: #334155;
+    -color-texto-suave: #475569;
+    -color-texto-input: #0F172A;
+    -color-seleccion: #E6F4EA;
+    -color-seleccion-texto: #065F46;
+    -color-auxiliar: #06674c;
+
+    -fx-background-color: -color-fondo;
     -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
-    -fx-text-fill: #334155;
+    -fx-text-fill: -color-texto;
+}
+
+.root.noche {
+    -color-fondo: #1F2937;
+    -color-superficie: #374151;
+    -color-suave: #4B5563;
+    -color-suave-hover: #6B7280;
+    -color-borde: #6B7280;
+    -color-borde-fuerte: #6B7280;
+    -color-borde-hover: #9CA3AF;
+    -color-texto: #F3F4F6;
+    -color-texto-suave: #D1D5DB;
+    -color-texto-input: #F3F4F6;
+    -color-seleccion: #065F46;
+    -color-seleccion-texto: #FFFFFF;
+    -color-auxiliar: #34D399;
 }
 
 .label {
-    -fx-text-fill: #334155;
+    -fx-text-fill: -color-texto;
 }
 
 /* ==========================================================================
    2. ESTRUCTURA (CABECERA, PANELES Y FOOTER)
-   ================================================================---------- */
+   ========================================================================== */
 .top, .bottom {
-    -fx-background-color: #FFFFFF;
-    -fx-border-color: #CBD5E1;
+    -fx-background-color: -color-superficie;
+    -fx-border-color: -color-borde;
 }
 
 .top {
@@ -28,23 +58,23 @@
 }
 
 .bottom .label {
-    -fx-text-fill: #475569;
+    -fx-text-fill: -color-texto-suave;
     -fx-font-size: 12px;
 }
 
 /* Tarjetas de contenido principales */
 .card {
-    -fx-background-color: #FFFFFF;
+    -fx-background-color: -color-superficie;
     -fx-background-radius: 10px;
     -fx-padding: 14px;
-    -fx-border-color: #CBD5E1;
+    -fx-border-color: -color-borde;
     -fx-border-radius: 10px;
     -fx-border-width: 1.5px;
 }
 
 /* ==========================================================================
    3. TIPOGRAFÍA Y TÍTULOS DISTINTIVOS
-   ================================================================---------- */
+   ========================================================================== */
 .logo-main {
     -fx-font-weight: bold;
     -fx-font-size: 16px;
@@ -55,7 +85,7 @@
     -fx-font-weight: bold;
     -fx-font-size: 13px;
     -fx-text-fill: #059669 !important;
-    -fx-border-color: #E2E8F0;
+    -fx-border-color: -color-borde;
     -fx-border-width: 0 0 1 0;
     -fx-padding: 0 0 5px 0;
 }
@@ -66,20 +96,20 @@
 }
 
 .textoAuxiliar {
-    -fx-text-fill: #06674c;
+    -fx-text-fill: -color-auxiliar;
     -fx-font-weight: bold;
 }
 
 /* ==========================================================================
    4. BOTONES Y CONTROLES INTERACTIVOS
-   ================================================================---------- */
+   ========================================================================== */
 .button, .toggle-button {
-    -fx-background-color: #F1F5F9;
-    -fx-text-fill: #334155;
+    -fx-background-color: -color-suave;
+    -fx-text-fill: -color-texto;
     -fx-background-radius: 6px;
     -fx-cursor: hand;
     -fx-font-weight: bold;
-    -fx-border-color: #94A3B8;
+    -fx-border-color: -color-borde-fuerte;
     -fx-border-radius: 6px;
 }
 
@@ -88,12 +118,12 @@
 }
 
 .button:hover, .toggle-button:hover {
-    -fx-background-color: #E2E8F0;
-    -fx-border-color: #64748B;
+    -fx-background-color: -color-suave-hover;
+    -fx-border-color: -color-borde-hover;
 }
 
 .button:pressed {
-    -fx-background-color: #CBD5E1;
+    -fx-background-color: -color-borde;
 }
 
 /* Botón principal de acción (Iniciar) */
@@ -109,15 +139,15 @@
 
 /* Botones secundarios agrupados (Limpiar, Examinar, Exportar, Detener) */
 #btnLimpiarStdout, #btnLimpiarStderr, #btnExaminar, #btnExportar, #btnDetener {
-    -fx-text-fill: #475569;
+    -fx-text-fill: -color-texto;
 }
 
 /* Botones de selección de modo (ToggleButtons) */
 .toggle-button {
     -fx-background-radius: 4px;
-    -fx-border-color: #CBD5E1;
+    -fx-border-color: -color-borde;
     -fx-border-radius: 4px;
-    -fx-text-fill: #475569;
+    -fx-text-fill: -color-texto;
 }
 
 .toggle-button:selected {
@@ -128,11 +158,11 @@
 
 /* ==========================================================================
    5. FORMULARIOS, ENTRADAS Y DESPLEGABLES
-   ================================================================---------- */
+   ========================================================================== */
 .combo-box, .text-field, .text-area, .spinner {
-    -fx-background-color: #FFFFFF;
-    -fx-text-fill: #0F172A;
-    -fx-border-color: #CBD5E1;
+    -fx-background-color: -color-superficie;
+    -fx-text-fill: -color-texto-input;
+    -fx-border-color: -color-borde;
     -fx-border-radius: 5px;
     -fx-background-radius: 5px;
 }
@@ -143,12 +173,12 @@
 }
 
 .text-area .content {
-    -fx-background-color: #FFFFFF;
+    -fx-background-color: -color-superficie;
 }
 
 .combo-box .list-cell, .combo-box-popup .list-view {
-    -fx-text-fill: #0F172A;
-    -fx-background-color: #FFFFFF;
+    -fx-text-fill: -color-texto-input;
+    -fx-background-color: -color-superficie;
 }
 
 .combo-box-popup .list-view .list-cell:hover {
@@ -158,18 +188,18 @@
 
 /* ==========================================================================
    6. TABLAS, PROGRESO Y PANELES AVANZADOS
-   ================================================================---------- */
+   ========================================================================== */
 .table-view {
-    -fx-background-color: #FFFFFF;
-    -fx-border-color: #CBD5E1;
+    -fx-background-color: -color-superficie;
+    -fx-border-color: -color-borde;
     -fx-border-radius: 8px;
     -fx-background-radius: 8px;
     -fx-border-width: 1.5px;
 }
 
 .table-view .column-header-background {
-    -fx-background-color: #F8FAFC;
-    -fx-border-color: #CBD5E1;
+    -fx-background-color: -color-suave;
+    -fx-border-color: -color-borde;
     -fx-border-width: 0 0 1 0;
 }
 
@@ -183,27 +213,27 @@
 }
 
 .table-row-cell {
-    -fx-background-color: #FFFFFF;
-    -fx-text-fill: #334155;
+    -fx-background-color: -color-superficie;
+    -fx-text-fill: -color-texto;
 }
 
 .table-row-cell:odd {
-    -fx-background-color: #F8FAFC;
+    -fx-background-color: -color-suave;
 }
 
 .table-row-cell:selected {
-    -fx-background-color: #E6F4EA;
-    -fx-text-fill: #065F46;
+    -fx-background-color: -color-seleccion;
+    -fx-text-fill: -color-seleccion-texto;
 }
 
 .table-cell {
-    -fx-text-fill: #334155;
+    -fx-text-fill: -color-texto;
 }
 
 /* Barra de progreso */
 .progress-bar .track {
-    -fx-background-color: #E2E8F0;
-    -fx-border-color: #CBD5E1;
+    -fx-background-color: -color-fondo;
+    -fx-border-color: -color-borde;
     -fx-border-radius: 4px;
     -fx-background-radius: 4px;
 }
@@ -215,17 +245,60 @@
 
 /* Panel avanzado (TitledPane) */
 .titled-pane {
-    -fx-text-fill: #334155;
+    -fx-text-fill: -color-texto;
 }
 
 .titled-pane > .title {
-    -fx-background-color: #F1F5F9;
+    -fx-background-color: -color-suave;
     -fx-background-radius: 5px;
-    -fx-border-color: #CBD5E1;
+    -fx-border-color: -color-borde;
     -fx-border-radius: 5px;
 }
 
 .titled-pane > .content {
-    -fx-background-color: #FFFFFF;
-    -fx-border-color: #CBD5E1;
+    -fx-background-color: -color-superficie;
+    -fx-border-color: -color-borde;
+}
+
+/* ==========================================================================
+   7. BOTÓN MODO NOCHE
+   ========================================================================== */
+.btnModoNoche {
+    -fx-background-color: #059669;
+    -fx-border-color: #059669;
+    -fx-border-width: 2;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+}
+
+.btnModoNoche.noche-activo {
+    -fx-background-color: #065F46;
+    -fx-border-color: #065F46;
+}
+
+.btnModoNoche .icono-modo {
+    -fx-min-width: 18;
+    -fx-min-height: 18;
+    -fx-pref-width: 18;
+    -fx-pref-height: 18;
+    -fx-max-width: 18;
+    -fx-max-height: 18;
+    -fx-background-color: white;
+    /* luna */
+    -fx-shape: "M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z";
+}
+
+.btnModoNoche.noche-activo .icono-modo {
+    /* sol */
+    -fx-shape: "M12 7a5 5 0 1 0 0 10a5 5 0 1 0 0-10z M11 1h2v3h-2z M11 20h2v3h-2z M1 11h3v2H1z M20 11h3v2h-3z M4.2 5.6l1.4-1.4 2.1 2.1-1.4 1.4z M19.8 5.6l-1.4-1.4-2.1 2.1 1.4 1.4z M4.2 18.4l1.4 1.4 2.1-2.1-1.4-1.4z M19.8 18.4l-1.4 1.4-2.1-2.1 1.4-1.4z";
+}
+
+.btnModoNoche:hover {
+    -fx-background-color: #065F46;
+    -fx-border-color: #065F46;
+}
+
+.btnModoNoche.noche-activo:hover {
+    -fx-background-color: #059669;
+    -fx-border-color: #059669;
 }

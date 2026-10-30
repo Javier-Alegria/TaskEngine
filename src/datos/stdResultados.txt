@@ -1,0 +1,6 @@
+--- Resultados de ejecución ---
+Procesos ejecutados: 0
+Procesos finalizados: 0
+Procesos en ejecución: 0
+Procesos con error: 0
+Tiempo total: 00:00:00.000

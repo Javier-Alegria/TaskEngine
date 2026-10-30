@@ -291,7 +291,7 @@ public class Lanzador {
      * Comprueba un fichero de salida (stdout / stderr) antes de lanzar.
      * Si no existe no es un error: redirectOutput lo crea. Sí hace falta que exista la carpeta.
      */
-    static String comprobarFicheroSalida(File f, String canal) {
+    public static String comprobarFicheroSalida(File f, String canal) {
         if (f == null) return "No se ha elegido fichero para " + canal;
 
         File carpeta = f.getAbsoluteFile().getParentFile();

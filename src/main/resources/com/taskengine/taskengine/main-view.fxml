@@ -20,7 +20,7 @@
     </stylesheets>
 
     <!-- ========================================= -->
-    <!--         CABECERA (LOGO Y POCO MÁS)        -->
+    <!--       CABECERA (LOGO Y MODO OSCURO)       -->
     <!-- ========================================= -->
     <top>
         <HBox alignment="CENTER_LEFT" spacing="20">
@@ -34,6 +34,12 @@
                 <Label text="Multi-Process Task Engine" styleClass="logo-main"/>
                 <Label text="RA1 – Programación de Servicios y Procesos" styleClass="logo-main"/>
             </VBox>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="btnModoOscuro"  styleClass="btnModoNoche" onAction="#activarDesactivarModoNoche">
+                <graphic>
+                    <Region styleClass="icono-modo"/>
+                </graphic>
+            </Button>
         </HBox>
     </top>
 
@@ -69,8 +75,8 @@
                     <VBox fx:id="cajaFichero" spacing="8">
                         <Label text="Fichero de entrada:"/>
                         <HBox spacing="10">
-                            <TextField fx:id="txtFichero" promptText="C:\Ruta\del\fichero" HBox.hgrow="ALWAYS"/>
-                            <Button fx:id="btnExaminar" text="Examinar..." onAction="#examinarFichero"/>
+                            <TextField fx:id="txtFichero" promptText="C:\Ruta\del\fichero" editable="false" HBox.hgrow="ALWAYS"/>
+                            <Button fx:id="btnExaminar" text="Examinar..." onAction="#examinarFicheroLlamada1"/>
                         </HBox>
                     </VBox>
                     <VBox fx:id="configTextAnalyzer" spacing="8">
@@ -235,7 +241,16 @@
                                 <ProgressBar fx:id="pgbLote" progress="0.0" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
                                 <Label fx:id="lblPorcentaje" text="0%"/>
                             </HBox>
-                            <Button fx:id="btnExportar" text="Exportar resultados..."/>
+
+                            <!-- Exportar resultados -->
+                            <VBox fx:id="cajaExportar" spacing="8">
+                                <Label text="Exportar resultados: "/>
+                                <HBox spacing="10">
+                                    <TextField fx:id="txtFicheroExportar" promptText="C:\Ruta\del\fichero" editable="false" HBox.hgrow="ALWAYS"/>
+                                    <Button fx:id="btnExaminarExportar" text="Examinar..." onAction="#examinarFicheroLlamada2"/>
+                                </HBox>
+                            </VBox>
+                            <Button fx:id="btnExportar" onAction="#onExportarResultados" text="Exportar resultados..."/>
                         </VBox>
                     </HBox>
                 </VBox>

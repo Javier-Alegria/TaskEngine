@@ -18,9 +18,8 @@ import javafx.stage.FileChooser;
 import javafx.util.Duration;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayDeque;
@@ -28,8 +27,12 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
+
 public class MainController {
     private static final String TEXT_ANALYZER = "Text Analyzer";
+
+    // Variables para modo noche
+    private static boolean modoNoche;
 
     // Textos de los ComboBox del panel 4 (deben coincidir con main-view.fxml)
     private static final String OPCION_CAPTURAR = "Capturar en la aplicación";
@@ -64,6 +67,8 @@ public class MainController {
     // Panel 1
     @FXML private ComboBox<String> cmbTarea;
     @FXML private Label lblDescripcion;
+
+    @FXML private Button btnModoOscuro;
 
     // Panel 2
     @FXML private VBox configTextAnalyzer;
@@ -115,6 +120,11 @@ public class MainController {
     @FXML private ProgressBar pgbLote;
     @FXML private Label lblPorcentaje;
 
+    // -- Botón de exportar resultados
+    @FXML private Button btnExportar;
+    @FXML private TextField txtFicheroExportar;
+    @FXML private Button btnExaminarExportar;
+
     // Barra de tareas/footer
     @FXML private Label lblUsuario;
     @FXML private Label lblModo;
@@ -136,6 +146,8 @@ public class MainController {
         // y se detecta si han terminado. Así la ventana no se congela y se puede usar destroy().
         monitor = new Timeline(new KeyFrame(Duration.millis(100), e -> revisarProcesos()));
         monitor.setCycleCount(Timeline.INDEFINITE);
+
+        modoNoche = false;
     }
 
     // =====================================================================
@@ -377,16 +389,48 @@ public class MainController {
     //                       CONFIGURACIÓN DE LA GUI
     // =====================================================================
 
-    /** Botón "Examinar..." del fichero de entrada. */
+    public void activarDesactivarModoNoche() {
+        modoNoche = !modoNoche;
+
+        var clasesBoton = btnModoOscuro.getStyleClass();
+        var clasesRaiz = btnModoOscuro.getScene().getRoot().getStyleClass();
+
+        if (modoNoche) {
+            clasesBoton.add("noche-activo");
+            clasesRaiz.add("noche");
+        } else {
+            clasesBoton.remove("noche-activo");
+            clasesRaiz.remove("noche");
+        }
+    }
+
+    /**
+     * Botón "Examinar..." del fichero de entrada campo 2
+     */
+    public void examinarFicheroLlamada1() {
+        examinarFichero(txtFichero);
+    }
+
+    /**
+     * Botón "Examinar..." del fichero de entrada campo 8 (Exportar resultados)
+     */
+    public void examinarFicheroLlamada2() {
+        examinarFichero(txtFicheroExportar);
+    }
+
+    /**
+     * Establece una ruta de un fichero al campo de texto rutaDeFichero indicada por una función auxiliar
+     * @param rutaDeFichero TextField donde poner la ruta (Se indica por la función auxiliar examinarFicheroLlamada)
+     */
     @FXML
-    private void examinarFichero() {
+    private void examinarFichero(TextField rutaDeFichero) {
         FileChooser fc = new FileChooser();
         fc.setTitle("Fichero de entrada");
         File datos = new File("src/datos");
         if (datos.isDirectory()) fc.setInitialDirectory(datos);
 
-        File f = fc.showOpenDialog(txtFichero.getScene().getWindow());
-        if (f != null) txtFichero.setText(f.getAbsolutePath());
+        File f = fc.showOpenDialog(rutaDeFichero.getScene().getWindow());
+        if (f != null) rutaDeFichero.setText(f.getAbsolutePath());
     }
 
     /**
@@ -470,9 +514,7 @@ public class MainController {
         lblProcesos.setText("Procesos: " + procesosEjecutados);
     }
 
-    // TODO:COMPROBAR CON LA PROFE PROBLEMA:
-    //                      NO HEMOS DADO EL TimeLine PERO ES NECESARIO PARA EL CONTADOR
-    //                      (y también para revisar los procesos sin congelar la ventana)
+
     private void iniciarContadorTiempoTotal() {
         if (contadorTiempoTotal != null) {
             contadorTiempoTotal.stop();
@@ -516,6 +558,68 @@ public class MainController {
                 .addListener((obs, anterior, seleccionado) -> mostrarSalidas(seleccionado));
     }
 
+    // ======================  EXPORTAR RESULTADOS BTN ========================
+
+    /**
+     * Exporta los resultados de ejecución a un fichero
+     */
+    public void onExportarResultados() {
+        String ruta = txtFicheroExportar.getText().trim();
+
+        if (ruta.isEmpty()) {
+            avisar("La ruta está vacía");
+            return;
+        }
+
+        File ficheroResultados = new File(ruta);
+
+        // Comprobaciones del fichero
+        if (ficheroResultados.isDirectory()) {
+            avisar("La ruta indicada debe ser un fichero, no un directorio");
+            return;
+        }
+
+        if (ficheroResultados.exists()) {
+            if(!ficheroResultados.canWrite()) {
+                avisar("No hay permisos de escritura para el archivo indicado");
+                return;
+            }
+        } else {
+            // Comprobar que la carpeta donde se creará existe y se puede escribir en ella
+            File carpeta = ficheroResultados.getAbsoluteFile().getParentFile();
+            if (carpeta == null || !carpeta.isDirectory() || !carpeta.canWrite()) {
+                avisar("La carpeta no existe o no se puede escribir en ella");
+                return;
+            }
+        }
+
+        String resultadosTexto = "--- Resultados de ejecución ---\n" +
+                "Procesos ejecutados: " + procesosEjecutados + "\n" +
+                "Procesos finalizados: " + procesosFinalizados + "\n" +
+                "Procesos en ejecución: " + procesosEnEjecucion + "\n" +
+                "Procesos con error: " + procesosConError + "\n" +
+                "Tiempo total (Último lote): " + lblTiempoTotal.getText();
+
+        escribirFichero(ruta, resultadosTexto);
+    }
+
+    /**
+     * Escribe texto en un fichero indicando la ruta (No valída si el fichero existe, solo escribe)
+     * @param ruta ruta del fichero
+     * @param texto texto a escribir en el fichero
+     */
+    private void escribirFichero(String ruta, String texto) {
+        try (FileWriter fw = new FileWriter(ruta, false)) {
+            fw.write(texto);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // =====================================================================
+    //                       MÉTODOS AUXILIARES
+    // =====================================================================
+
     /**
      * Actualiza el texto de 'modo' en el Footer según el botón pulsado
      * @param actionEvent acción evento
@@ -546,6 +650,13 @@ public class MainController {
         }
     }
 
+    // ======================  CAMBIAR TAREA (TEXT ANALYZER O BENCHMARK) ========================
+
+    /**
+     * Según la configuración del panle 2, muestra una cosa u otra
+     * @param nodo Cada elemento individual de la interfaz gráfica
+     * @param visible True si se pone visible
+     */
     private void mostrar(javafx.scene.Node nodo, boolean visible) {
         nodo.setVisible(visible);
         nodo.setManaged(visible);
