@@ -1,0 +1,231 @@
+/* ==========================================================================
+   1. TEMA GENERAL Y CONFIGURACIÓN BASE
+   ================================================================---------- */
+.root {
+    -fx-background-color: #E2E8F0;
+    -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+    -fx-text-fill: #334155;
+}
+
+.label {
+    -fx-text-fill: #334155;
+}
+
+/* ==========================================================================
+   2. ESTRUCTURA (CABECERA, PANELES Y FOOTER)
+   ================================================================---------- */
+.top, .bottom {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #CBD5E1;
+}
+
+.top {
+    -fx-border-width: 0 0 2 0;
+}
+
+.bottom {
+    -fx-border-width: 2 0 0 0;
+}
+
+.bottom .label {
+    -fx-text-fill: #475569;
+    -fx-font-size: 12px;
+}
+
+/* Tarjetas de contenido principales */
+.card {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 10px;
+    -fx-padding: 14px;
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 10px;
+    -fx-border-width: 1.5px;
+}
+
+/* ==========================================================================
+   3. TIPOGRAFÍA Y TÍTULOS DISTINTIVOS
+   ================================================================---------- */
+.logo-main {
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+    -fx-text-fill: #059669;
+}
+
+.section-title {
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-text-fill: #059669 !important;
+    -fx-border-color: #E2E8F0;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 0 0 5px 0;
+}
+
+.principalText {
+    -fx-text-fill: #059669;
+    -fx-font-weight: bold;
+}
+
+.textoAuxiliar {
+    -fx-text-fill: #06674c;
+    -fx-font-weight: bold;
+}
+
+/* ==========================================================================
+   4. BOTONES Y CONTROLES INTERACTIVOS
+   ================================================================---------- */
+.button, .toggle-button {
+    -fx-background-color: #F1F5F9;
+    -fx-text-fill: #334155;
+    -fx-background-radius: 6px;
+    -fx-cursor: hand;
+    -fx-font-weight: bold;
+    -fx-border-color: #94A3B8;
+    -fx-border-radius: 6px;
+}
+
+.button {
+    -fx-padding: 6px 14px;
+}
+
+.button:hover, .toggle-button:hover {
+    -fx-background-color: #E2E8F0;
+    -fx-border-color: #64748B;
+}
+
+.button:pressed {
+    -fx-background-color: #CBD5E1;
+}
+
+/* Botón principal de acción (Iniciar) */
+#btnIniciar {
+    -fx-background-color: #059669;
+    -fx-text-fill: #FFFFFF;
+    -fx-border-color: #047857;
+}
+
+#btnIniciar:hover {
+    -fx-background-color: #10B981;
+}
+
+/* Botones secundarios agrupados (Limpiar, Examinar, Exportar, Detener) */
+#btnLimpiarStdout, #btnLimpiarStderr, #btnExaminar, #btnExportar, #btnDetener {
+    -fx-text-fill: #475569;
+}
+
+/* Botones de selección de modo (ToggleButtons) */
+.toggle-button {
+    -fx-background-radius: 4px;
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 4px;
+    -fx-text-fill: #475569;
+}
+
+.toggle-button:selected {
+    -fx-background-color: #059669;
+    -fx-text-fill: #FFFFFF;
+    -fx-border-color: #047857;
+}
+
+/* ==========================================================================
+   5. FORMULARIOS, ENTRADAS Y DESPLEGABLES
+   ================================================================---------- */
+.combo-box, .text-field, .text-area, .spinner {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #0F172A;
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+.text-field:focused, .text-area:focused, .combo-box:focused, .spinner:focused {
+    -fx-border-color: #059669;
+    -fx-border-width: 1.5px;
+}
+
+.text-area .content {
+    -fx-background-color: #FFFFFF;
+}
+
+.combo-box .list-cell, .combo-box-popup .list-view {
+    -fx-text-fill: #0F172A;
+    -fx-background-color: #FFFFFF;
+}
+
+.combo-box-popup .list-view .list-cell:hover {
+    -fx-background-color: #059669;
+    -fx-text-fill: #FFFFFF;
+}
+
+/* ==========================================================================
+   6. TABLAS, PROGRESO Y PANELES AVANZADOS
+   ================================================================---------- */
+.table-view {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-border-width: 1.5px;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #F8FAFC;
+    -fx-border-color: #CBD5E1;
+    -fx-border-width: 0 0 1 0;
+}
+
+.table-view .column-header, .table-view .filler {
+    -fx-background-color: transparent;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #059669;
+    -fx-font-weight: bold;
+}
+
+.table-row-cell {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #334155;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #F8FAFC;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #E6F4EA;
+    -fx-text-fill: #065F46;
+}
+
+.table-cell {
+    -fx-text-fill: #334155;
+}
+
+/* Barra de progreso */
+.progress-bar .track {
+    -fx-background-color: #E2E8F0;
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+}
+
+.progress-bar .bar {
+    -fx-background-color: #059669;
+    -fx-background-radius: 4px;
+}
+
+/* Panel avanzado (TitledPane) */
+.titled-pane {
+    -fx-text-fill: #334155;
+}
+
+.titled-pane > .title {
+    -fx-background-color: #F1F5F9;
+    -fx-background-radius: 5px;
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 5px;
+}
+
+.titled-pane > .content {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #CBD5E1;
+}

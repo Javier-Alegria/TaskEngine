@@ -1,0 +1,6 @@
+--- Resultado del análisis ---
+Líneas: 1
+Palabras: 12
+Caracteres: 97
+Palabra más larga: enablenativeaccessjavafxgraphics
+Apariciones de 'WARNING': 2

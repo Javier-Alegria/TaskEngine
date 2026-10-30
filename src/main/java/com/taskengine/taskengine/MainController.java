@@ -1,9 +1,9 @@
 package com.taskengine.taskengine;
 
-import com.taskengine.taskengine.textanalyzer.Lanzador;
-import com.taskengine.taskengine.textanalyzer.Lanzador.DestinoSalida;
-import com.taskengine.taskengine.textanalyzer.Lanzador.Estado;
-import com.taskengine.taskengine.textanalyzer.Lanzador.OrigenEntrada;
+import com.taskengine.taskengine.Lanzador.Lanzador;
+import com.taskengine.taskengine.Lanzador.Lanzador.DestinoSalida;
+import com.taskengine.taskengine.Lanzador.Lanzador.Estado;
+import com.taskengine.taskengine.Lanzador.Lanzador.OrigenEntrada;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -19,6 +19,8 @@ import javafx.util.Duration;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayDeque;
@@ -28,6 +30,7 @@ import java.util.List;
 
 public class MainController {
     private static final String TEXT_ANALYZER = "Text Analyzer";
+    private static final String PRIME_BENCHMARK = "Prime Benchmark";
 
     // Textos de los ComboBox del panel 4 (deben coincidir con main-view.fxml)
     private static final String OPCION_CAPTURAR = "Capturar en la aplicación";
@@ -58,6 +61,9 @@ public class MainController {
 
     // Comprobación periódica de los procesos (sin hilos: se ejecuta en el hilo de JavaFX)
     private Timeline monitor;
+
+    //Numero limite de primeBenchmark
+    String limiteN;
 
     // Panel 1
     @FXML private ComboBox<String> cmbTarea;
@@ -140,7 +146,7 @@ public class MainController {
     //                         LANZAR EJECUCIONES
     // =====================================================================
 
-    /** Botón "Iniciar ejecución" (panel 3). */
+    /** Boton "Iniciar ejecucion" (panel 3). */
     @FXML
     private void iniciarEjecucion() {
         if (hayLoteEnCurso()) {
@@ -148,19 +154,25 @@ public class MainController {
             return;
         }
 
-        if (!TEXT_ANALYZER.equals(cmbTarea.getValue())) {
-            avisar("Prime Benchmark todavía no está implementado.");   // TODO: Lanzador.primeBenchmark(...)
+        // ====================================================================
+        String tarea = cmbTarea.getValue();
+        String errorGUI = validarConfiguracion(tarea);
+        if (errorGUI != null) {
+            avisar(errorGUI);
             return;
         }
+        limiteN = txtLimiteN.getText().trim();
 
         // ---------- 1. Leer la configuración de la GUI ----------
         String palabra = txtPalabra.getText().trim();
-        if (palabra.isEmpty()) {
+        if (tarea.equals(TEXT_ANALYZER) && palabra.isEmpty()) {
             avisar("Escribe la palabra a buscar.");
             return;
         }
 
-        OrigenEntrada entrada = STDIN_FICHERO.equals(cmbStdin.getValue()) ? OrigenEntrada.FICHERO_ARGUMENTO : OrigenEntrada.DESDE_DATAFORGE;
+        // ====================================================================
+        OrigenEntrada entrada = STDIN_FICHERO.equals(cmbStdin.getValue())
+                ? OrigenEntrada.FICHERO_ARGUMENTO : OrigenEntrada.DESDE_DATAFORGE;
 
         String ruta = txtFichero.getText().trim();
         if (entrada == OrigenEntrada.FICHERO_ARGUMENTO && ruta.isEmpty()) {
@@ -168,6 +180,7 @@ public class MainController {
             return;
         }
         // No se comprueba si el fichero existe. Eso lo hace TextAnalyzer (stderr + código 2).
+
 
         DestinoSalida destinoOut = destinoDe(cmbStdout.getValue());
         DestinoSalida destinoErr = destinoDe(cmbStderr.getValue());
@@ -182,7 +195,8 @@ public class MainController {
         loteActual.clear();
         colaSecuencial.clear();
         for (int i = 0; i < n; i++) {
-            Lanzador l = Lanzador.textAnalyzer(siguienteId, entrada, ruta, txtTextoStdin.getText(), palabra);
+
+            Lanzador l = crearLanzador(tarea, siguienteId);
             l.setRedirecciones(destinoOut, ficheroOut, destinoErr, ficheroErr);
 
             if (i == 0) {   // todas tienen la misma configuración: basta con validar la primera
@@ -240,6 +254,19 @@ public class MainController {
             }
             // Si estaba cancelado o no se pudo lanzar, se pasa al siguiente
         }
+    }
+
+    private Lanzador crearLanzador(String tarea, int id){
+        OrigenEntrada entrada = STDIN_FICHERO.equals(cmbStdin.getValue())
+                ? OrigenEntrada.FICHERO_ARGUMENTO
+                : OrigenEntrada.DESDE_DATAFORGE;
+
+        if (PRIME_BENCHMARK.equals(tarea)) {
+            return Lanzador.primeBenchmark(id,entrada,txtFichero.getText().trim(),limiteN);
+        }
+
+        return Lanzador.textAnalyzer(id,entrada, txtFichero.getText().trim(),
+                txtTextoStdin.getText(),txtPalabra.getText().trim());
     }
 
     // =====================================================================
@@ -301,6 +328,24 @@ public class MainController {
         return loteActual.stream().anyMatch(l -> !l.estaTerminado());
     }
 
+
+    private String validarConfiguracion(String tarea){
+        if (TEXT_ANALYZER.equals(tarea) ) {
+            if (txtPalabra.getText().trim().isEmpty()){
+                return "Escribe la palabra a buscar";
+            }
+
+            if (STDIN_FICHERO.equals(cmbStdin.getValue()) & txtFichero.getText().trim().isEmpty() ){
+                return "Indica el fichero de entrada (Desde aplicacion)";
+            }
+        }else if(PRIME_BENCHMARK.equals(tarea)){
+            if (txtLimiteN.getText().trim().isEmpty()){
+                return "Escribe el límite N";
+            }
+        }
+        return null;
+    }
+
     // =====================================================================
     //                      DETENER (Process.destroy())
     // =====================================================================
@@ -358,6 +403,7 @@ public class MainController {
             case CAPTURAR -> capturado;
             case FICHERO -> canal + " → FICHERO: salida guardada en\n" + fichero.getAbsolutePath();
             case DISCARD -> canal + " → DISCARD: salida descartada";
+            case TUBERIA -> canal + " → TUBERÍA: salida enviada por el pipe a la entrada estándar de Text Analyzer";
         };
     }
 
@@ -423,19 +469,24 @@ public class MainController {
         // Panel 2: en modo fichero se pide la ruta; en modo stdin, el texto a enviar
         mostrar(cajaFichero, modoFichero);
         mostrar(cajaTextoStdin, !modoFichero);
+
+        // Límite N: solo con Prime Benchmark y stdin "Desde la aplicación"
+        boolean esTextAnalyzer = TEXT_ANALYZER.equals(cmbTarea.getValue());
+        mostrar(configPrimeBenchmark, !esTextAnalyzer && !modoFichero);
     }
 
     private void actualizarTarea(String tarea) {
         boolean esTextAnalyzer = TEXT_ANALYZER.equals(tarea);
 
         mostrar(configTextAnalyzer, esTextAnalyzer);
-        mostrar(configPrimeBenchmark, !esTextAnalyzer);
 
         if (esTextAnalyzer) {
             lblDescripcion.setText("Analiza un fichero de texto y devuelve estadísticas por la salida estándar.");
         } else {
             lblDescripcion.setText("Calcula los números primos hasta N y mide el tiempo de ejecución.");
         }
+
+        actualizarArchivos();
     }
 
     private DestinoSalida destinoDe(String opcion) {
