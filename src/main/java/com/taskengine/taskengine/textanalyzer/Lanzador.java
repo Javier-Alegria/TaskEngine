@@ -36,10 +36,10 @@ public class Lanzador {
     }
 
     public enum Estado {
-        EN_ESPERA("En espera"),     // creado pero aún sin start() (modo secuencial)
+        EN_ESPERA("En espera"),     // creado pero aun sin start() (modo secuencial)
         EJECUTANDO("Ejecutando"),
-        FINALIZADO("Finalizado"),   // código 0
-        ERROR("Error"),             // código distinto de 0 o fallo al lanzar
+        FINALIZADO("Finalizado"),   // codigo 0
+        ERROR("Error"),             // codigo distinto de 0 o fallo al lanzar
         CANCELADO("Cancelado");     // detenido por el usuario con destroy()
 
         private final String texto;
@@ -47,10 +47,10 @@ public class Lanzador {
         @Override public String toString() { return texto; }
     }
 
-    // ---------- Datos de configuración (se conocen al crear la ejecución) ----------
+    // ---------- Datos de configuracion (se conocen al crear la ejecucion) ----------
     private final int id;
     private final String tarea;
-    private final String parametros;          // texto que se muestra en la columna "Parámetros"
+    private final String parametros;          // texto que se muestra en la columna "Parametros"
     private final List<String> comando;
     private final OrigenEntrada origenEntrada;
     private final String textoStdin;          // solo se usa en DESDE_DATAFORGE

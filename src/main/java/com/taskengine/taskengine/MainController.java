@@ -160,16 +160,14 @@ public class MainController {
             return;
         }
 
-        OrigenEntrada entrada = STDIN_FICHERO.equals(cmbStdin.getValue())
-                ? OrigenEntrada.FICHERO_ARGUMENTO
-                : OrigenEntrada.DESDE_DATAFORGE;
+        OrigenEntrada entrada = STDIN_FICHERO.equals(cmbStdin.getValue()) ? OrigenEntrada.FICHERO_ARGUMENTO : OrigenEntrada.DESDE_DATAFORGE;
 
         String ruta = txtFichero.getText().trim();
         if (entrada == OrigenEntrada.FICHERO_ARGUMENTO && ruta.isEmpty()) {
             avisar("Indica el fichero de entrada (o elige stdin \"" + STDIN_APLICACION + "\").");
             return;
         }
-        // OJO: no se comprueba si el fichero existe. Eso lo hace TextAnalyzer (stderr + código 2).
+        // No se comprueba si el fichero existe. Eso lo hace TextAnalyzer (stderr + código 2).
 
         DestinoSalida destinoOut = destinoDe(cmbStdout.getValue());
         DestinoSalida destinoErr = destinoDe(cmbStderr.getValue());
