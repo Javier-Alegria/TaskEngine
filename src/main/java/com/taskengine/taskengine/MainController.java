@@ -19,8 +19,6 @@ import javafx.util.Duration;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayDeque;
@@ -31,6 +29,7 @@ import java.util.List;
 public class MainController {
     private static final String TEXT_ANALYZER = "Text Analyzer";
     private static final String PRIME_BENCHMARK = "Prime Benchmark";
+    private static final String PIPELINE = "Pipeline: PrimeBenchMark -> TextAnalyzer";
 
     // Textos de los ComboBox del panel 4 (deben coincidir con main-view.fxml)
     private static final String OPCION_CAPTURAR = "Capturar en la aplicación";
@@ -44,7 +43,7 @@ public class MainController {
     /** Una fila del monitor = un Lanzador = un proceso lanzado. */
     private final ObservableList<Lanzador> procesos = FXCollections.observableArrayList();
 
-    // Lote en curso (lo que se lanzó con el último "Iniciar ejecución")
+    // Lote en curso (lo que se lanzó con el ultimo "Iniciar ejecución")
     private final List<Lanzador> loteActual = new ArrayList<>();
     private final Deque<Lanzador> colaSecuencial = new ArrayDeque<>();
 
@@ -72,6 +71,7 @@ public class MainController {
     // Panel 2
     @FXML private VBox configTextAnalyzer;
     @FXML private VBox configPrimeBenchmark;
+    @FXML private VBox configPipe;      //Añadido
     @FXML private VBox cajaFichero;
     @FXML private VBox cajaTextoStdin;
     @FXML private TextField txtFichero;
@@ -187,6 +187,13 @@ public class MainController {
         File ficheroOut = ficheroDe(txtArchivoStdout);
         File ficheroErr = ficheroDe(txtArchivoStderr);
 
+        // El Pipeline va aparte: un único lanzamiento de dos procesos, sin modo secuencial/paralelo
+        if (PIPELINE.equals(tarea) ) {
+            lanzarPipeline(destinoOut,ficheroOut,destinoErr,ficheroErr);
+            return;
+        }
+
+
         spnProcesos.increment(0);               // confirma el número si se ha escrito a mano
         int n = spnProcesos.getValue();
         boolean paralelo = tglParalelo.isSelected();
@@ -256,6 +263,12 @@ public class MainController {
         }
     }
 
+    /**
+     * Metodo encargado de lanzar cada objeto Process segun la tarea seleccionada
+     * @param tarea
+     * @param id
+     * @return
+     */
     private Lanzador crearLanzador(String tarea, int id){
         OrigenEntrada entrada = STDIN_FICHERO.equals(cmbStdin.getValue())
                 ? OrigenEntrada.FICHERO_ARGUMENTO
@@ -268,6 +281,8 @@ public class MainController {
         return Lanzador.textAnalyzer(id,entrada, txtFichero.getText().trim(),
                 txtTextoStdin.getText(),txtPalabra.getText().trim());
     }
+
+
 
     // =====================================================================
     //                 SEGUIMIENTO DE LOS PROCESOS (Timeline)
@@ -334,17 +349,81 @@ public class MainController {
             if (txtPalabra.getText().trim().isEmpty()){
                 return "Escribe la palabra a buscar";
             }
-
             if (STDIN_FICHERO.equals(cmbStdin.getValue()) & txtFichero.getText().trim().isEmpty() ){
                 return "Indica el fichero de entrada (Desde aplicacion)";
             }
+
         }else if(PRIME_BENCHMARK.equals(tarea)){
             if (txtLimiteN.getText().trim().isEmpty()){
                 return "Escribe el límite N";
             }
+
+        } else if (PIPELINE.equals(tarea) ){
+            if (txtLimiteN.getText().trim().isEmpty()){
+                return "Escribe el limite N para PrimeBenchMark";
+            }
+            if (txtPalabra.getText().trim().isEmpty()){
+                return "Escribe la palabra que buscara TextAnalyzer";
+            }
         }
         return null;
     }
+
+
+
+    /** ================================================================================
+     *  Pipeline: UN UNICO LANZAMIENTO DE 2 PROCESOS CONECTADOS A TRAVES DE UNA TUBERIA
+     *  ================================================================================
+     *   Prime Benchmark <N>  --stdout--> PIPE --stdin--> Text Analyzer <palabra>
+     *    Cada proceso es un Lanzador (una fila del monitor) y el Timeline los revisa por separado.
+     *  - stdout: la opcion de la GUI se aplica a Text Analyzer, que es el que da el resultado final
+     *    El stdout de Prime Benchmark siempre va a la tuberia (lo fija Lanzador.iniciarPipeline).
+     *  - stderr: la opcion de la GUI se aplica a Text Analyzer. El de Prime Benchmark siempre se
+     *    captura, para poder ver en su fila por qué ha fallado el primer proceso.
+     */
+    private void lanzarPipeline(DestinoSalida destinoOut, File ficheroOut, DestinoSalida destinoErr, File ficheroErr) {
+        Lanzador prime = Lanzador.primeBenchmark(siguienteId, OrigenEntrada.DESDE_DATAFORGE, null, txtLimiteN.getText().trim());
+
+        // Text Analyzer en modo stdin (solo la palabra como argumento): su stdin sera la tuberia
+        Lanzador text = Lanzador.textAnalyzer(siguienteId + 1, OrigenEntrada.DESDE_DATAFORGE, null, null, txtPalabra.getText().trim());
+
+        prime.setRedirecciones(DestinoSalida.CAPTURAR, null, DestinoSalida.CAPTURAR, null);
+        text.setRedirecciones(destinoOut, ficheroOut, destinoErr, ficheroErr);
+
+        String error = text.validar();   // ficheros de salida, si se han elegido
+        if (error != null) {
+            avisar(error);
+            return;
+        }
+
+        siguienteId += 2;
+        loteActual.clear();
+        colaSecuencial.clear();
+        loteActual.add(prime);
+        loteActual.add(text);
+        procesos.addAll(loteActual);
+        tblProcesos.getSelectionModel().select(text);   // el resultado final es el de Text Analyzer
+
+        iniciarContadorTiempoTotal();
+        try {
+            Lanzador.iniciarPipeline(prime, text);
+            procesosEjecutados += 2;
+            procesosEnEjecucion += 2;
+        } catch (IOException e) {
+            // No se ha podido crear alguno de los dos: startPipeline() no deja ninguno en marcha
+            procesosConError += 2;
+            mostrarSalidas(text);
+        }
+
+        monitor.play();
+        comprobarFinDeLote();
+        actualizarEstadisticas();
+        tblProcesos.refresh();
+    }
+
+
+
+
 
     // =====================================================================
     //                      DETENER (Process.destroy())
@@ -477,8 +556,13 @@ public class MainController {
 
     private void actualizarTarea(String tarea) {
         boolean esTextAnalyzer = TEXT_ANALYZER.equals(tarea);
+        boolean esPrime = PRIME_BENCHMARK.equals(tarea);
+        boolean esPipe = PIPELINE.equals(tarea);
 
+        //Panel 2: solo la configuracion de la tarea elegida
         mostrar(configTextAnalyzer, esTextAnalyzer);
+        mostrar(configPrimeBenchmark, esPrime);
+        mostrar(configPipe, esPipe);
 
         if (esTextAnalyzer) {
             lblDescripcion.setText("Analiza un fichero de texto y devuelve estadísticas por la salida estándar.");

@@ -170,6 +170,10 @@ public class Lanzador {
         return null;
     }
 
+
+
+
+
     public void iniciar() throws IOException {
         ProcessBuilder pb = new ProcessBuilder(comando);
         configurarRedirecciones(pb);
@@ -242,6 +246,11 @@ public class Lanzador {
             throw e;
         }
     }
+
+
+
+
+
 
 
     private void configurarRedirecciones(ProcessBuilder pb) {
