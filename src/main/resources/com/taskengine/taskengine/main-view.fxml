@@ -57,7 +57,7 @@
                             <FXCollections fx:factory="observableArrayList">
                                 <String fx:value="Text Analyzer"/>
                                 <String fx:value="Prime Benchmark"/>
-                                <String fx:value="Prime Benchmark → Text Analyzer"/>
+                                <String fx:value="Pipeline: PrimeBenchMark -> TextAnalyzer"/>
                             </FXCollections>
                         </items>
                     </ComboBox>
@@ -74,6 +74,7 @@
                             <Button fx:id="btnExaminar" text="Examinar..." onAction="#examinarFichero"/>
                         </HBox>
                     </VBox>
+
                     <VBox fx:id="configTextAnalyzer" spacing="8">
                         <VBox fx:id="cajaTextoStdin" spacing="8">
                             <Label text="Texto a enviar por stdin:" styleClass="textoAuxiliar"/>
@@ -83,11 +84,21 @@
                         <Label text="Palabra a buscar:" styleClass="textoAuxiliar"/>
                         <TextField fx:id="txtPalabra" promptText="Palabra"/>
                     </VBox>
+
                     <VBox fx:id="configPrimeBenchmark" spacing="8">
                         <Label text="Límite N:"/>
                         <TextField fx:id="txtLimiteN" promptText="Ej.: 500000"/>
                     </VBox>
+
+                    <VBox fx:id="configPipe" spacing="8">
+                        <Label text="Límite N (Prime Benchmark):"/>
+                        <TextField fx:id="txtLimiteNPipe" promptText="Ej.: 20000"/>
+                        <Label text="Palabra a buscar (Text Analyzer):"/>
+                        <TextField fx:id="txtPalabraPipe" promptText="Ej.: primos"/>
+                    </VBox>
+
                 </VBox>
+
 
                 <!-- Panel 3: Modo de ejecución -->
                 <VBox spacing="10" prefWidth="305" HBox.hgrow="ALWAYS" styleClass="card">

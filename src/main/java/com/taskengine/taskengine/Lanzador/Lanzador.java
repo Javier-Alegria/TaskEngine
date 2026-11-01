@@ -48,7 +48,7 @@ public class Lanzador {
 
     // ---------- Datos de configuracion (se conocen al crear la ejecucion) ----------
     private final int id;
-    private final String tarea;
+    private  String tarea;                    // no es final: el Pipeline le añade el prefijo "Pipeline"
     private final String parametros;          // texto que se muestra en la columna "Parametros"
     private final List<String> comando;
     private final OrigenEntrada origenEntrada;
@@ -227,6 +227,8 @@ public class Lanzador {
      */
     public static void iniciarPipeline(Lanzador productor, Lanzador consumidor) throws IOException {
         productor.destinoStdout = DestinoSalida.TUBERIA;   // su salida no va a DataForge: va a la tubería
+        productor.tarea = "Pipeline " + productor.tarea;
+        consumidor.tarea = "Pipeline " + consumidor.tarea;
 
         ProcessBuilder pbProductor = new ProcessBuilder(productor.comando);
         ProcessBuilder pbConsumidor = new ProcessBuilder(consumidor.comando);

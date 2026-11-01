@@ -61,9 +61,6 @@ public class MainController {
     // Comprobación periódica de los procesos (sin hilos: se ejecuta en el hilo de JavaFX)
     private Timeline monitor;
 
-    //Numero limite de primeBenchmark
-    String limiteN;
-
     // Panel 1
     @FXML private ComboBox<String> cmbTarea;
     @FXML private Label lblDescripcion;
@@ -78,6 +75,8 @@ public class MainController {
     @FXML private TextField txtPalabra;
     @FXML private TextArea txtTextoStdin;
     @FXML private TextField txtLimiteN;
+    @FXML private TextField txtLimiteNPipe;
+    @FXML private TextField txtPalabraPipe;
 
     // Panel 3
     @FXML private ToggleButton tglParalelo;
@@ -126,12 +125,17 @@ public class MainController {
     @FXML private Label lblInicio;
 
 
+
     @FXML
     private void initialize() {
         configurarTabla();
         setHoraInicio();
         actualizarArchivos();
         actualizarEstadisticas();
+
+        // las constantes son la única fuente del texto
+        cmbTarea.getItems().setAll(TEXT_ANALYZER, PRIME_BENCHMARK, PIPELINE);
+        cmbTarea.setValue(TEXT_ANALYZER);
 
         cmbTarea.valueProperty().addListener((obs, anterior, nueva) -> actualizarTarea(nueva));
         actualizarTarea(cmbTarea.getValue());
@@ -154,38 +158,22 @@ public class MainController {
             return;
         }
 
-        // ====================================================================
+        //---------- 1. Comprobar la configuración de la GUI ----------
         String tarea = cmbTarea.getValue();
         String errorGUI = validarConfiguracion(tarea);
         if (errorGUI != null) {
             avisar(errorGUI);
             return;
         }
-        limiteN = txtLimiteN.getText().trim();
 
-        // ---------- 1. Leer la configuración de la GUI ----------
-        String palabra = txtPalabra.getText().trim();
-        if (tarea.equals(TEXT_ANALYZER) && palabra.isEmpty()) {
-            avisar("Escribe la palabra a buscar.");
-            return;
-        }
-
-        // ====================================================================
-        OrigenEntrada entrada = STDIN_FICHERO.equals(cmbStdin.getValue())
-                ? OrigenEntrada.FICHERO_ARGUMENTO : OrigenEntrada.DESDE_DATAFORGE;
-
-        String ruta = txtFichero.getText().trim();
-        if (entrada == OrigenEntrada.FICHERO_ARGUMENTO && ruta.isEmpty()) {
-            avisar("Indica el fichero de entrada (o elige stdin \"" + STDIN_APLICACION + "\").");
-            return;
-        }
-        // No se comprueba si el fichero existe. Eso lo hace TextAnalyzer (stderr + código 2).
-
+        // No se comprueba si el fichero existe ni si N es un número valido:
+        // lo detectan TextAnalyzer y PrimeBenchmark (stderr + código distinto de 0)
 
         DestinoSalida destinoOut = destinoDe(cmbStdout.getValue());
         DestinoSalida destinoErr = destinoDe(cmbStderr.getValue());
         File ficheroOut = ficheroDe(txtArchivoStdout);
         File ficheroErr = ficheroDe(txtArchivoStderr);
+
 
         // El Pipeline va aparte: un único lanzamiento de dos procesos, sin modo secuencial/paralelo
         if (PIPELINE.equals(tarea) ) {
@@ -193,8 +181,7 @@ public class MainController {
             return;
         }
 
-
-        spnProcesos.increment(0);               // confirma el número si se ha escrito a mano
+        spnProcesos.increment(0);                   // confirma el número si se ha escrito a mano
         int n = spnProcesos.getValue();
         boolean paralelo = tglParalelo.isSelected();
 
@@ -275,7 +262,7 @@ public class MainController {
                 : OrigenEntrada.DESDE_DATAFORGE;
 
         if (PRIME_BENCHMARK.equals(tarea)) {
-            return Lanzador.primeBenchmark(id,entrada,txtFichero.getText().trim(),limiteN);
+            return Lanzador.primeBenchmark(id,entrada,txtFichero.getText().trim(),txtLimiteN.getText().trim());
         }
 
         return Lanzador.textAnalyzer(id,entrada, txtFichero.getText().trim(),
@@ -343,27 +330,41 @@ public class MainController {
         return loteActual.stream().anyMatch(l -> !l.estaTerminado());
     }
 
-
+    /**
+     * Comprueba que la GUI tiene los datos mínimos para la tarea elegida.
+     * Solo se comprueba que los campos no estén vacíos: si el fichero no existe o N no es un número
+     * válido, lo detecta el programa externo (stderr + código distinto de 0).
+     * @return null si todo está bien, o el mensaje de aviso
+     */
     private String validarConfiguracion(String tarea){
-        if (TEXT_ANALYZER.equals(tarea) ) {
-            if (txtPalabra.getText().trim().isEmpty()){
-                return "Escribe la palabra a buscar";
+        boolean modoFichero = STDIN_FICHERO.equals(cmbStdin.getValue());
+        String ruta = txtFichero.getText().trim();
+
+        if (TEXT_ANALYZER.equals(tarea)) {
+            if (txtPalabra.getText().trim().isEmpty()) {
+                return "Escribe la palabra a buscar.";
             }
-            if (STDIN_FICHERO.equals(cmbStdin.getValue()) & txtFichero.getText().trim().isEmpty() ){
-                return "Indica el fichero de entrada (Desde aplicacion)";
+            if (modoFichero && ruta.isEmpty()) {
+                return "Indica el fichero de entrada (o elige stdin \"" + STDIN_APLICACION + "\").";
             }
 
-        }else if(PRIME_BENCHMARK.equals(tarea)){
-            if (txtLimiteN.getText().trim().isEmpty()){
-                return "Escribe el límite N";
+        } else if (PRIME_BENCHMARK.equals(tarea)) {
+            if (modoFichero) {
+                // PrimeBenchmark -f <ruta>: N se lee de la primera línea del fichero
+                if (ruta.isEmpty()) {
+                    return "Indica el fichero que contiene N (o elige stdin \"" + STDIN_APLICACION + "\").";
+                }
+            } else if (txtLimiteN.getText().trim().isEmpty()) {
+                // PrimeBenchmark <N>
+                return "Escribe el límite N.";
             }
 
-        } else if (PIPELINE.equals(tarea) ){
-            if (txtLimiteN.getText().trim().isEmpty()){
-                return "Escribe el limite N para PrimeBenchMark";
+        } else if (PIPELINE.equals(tarea)) {
+            if (txtLimiteNPipe.getText().trim().isEmpty()) {
+                return "Escribe el límite N para Prime Benchmark.";
             }
-            if (txtPalabra.getText().trim().isEmpty()){
-                return "Escribe la palabra que buscara TextAnalyzer";
+            if (txtPalabraPipe.getText().trim().isEmpty()) {
+                return "Escribe la palabra que buscará Text Analyzer.";
             }
         }
         return null;
@@ -382,10 +383,10 @@ public class MainController {
      *    captura, para poder ver en su fila por qué ha fallado el primer proceso.
      */
     private void lanzarPipeline(DestinoSalida destinoOut, File ficheroOut, DestinoSalida destinoErr, File ficheroErr) {
-        Lanzador prime = Lanzador.primeBenchmark(siguienteId, OrigenEntrada.DESDE_DATAFORGE, null, txtLimiteN.getText().trim());
+        Lanzador prime = Lanzador.primeBenchmark(siguienteId, OrigenEntrada.DESDE_DATAFORGE, null, txtLimiteNPipe.getText().trim());
 
         // Text Analyzer en modo stdin (solo la palabra como argumento): su stdin sera la tuberia
-        Lanzador text = Lanzador.textAnalyzer(siguienteId + 1, OrigenEntrada.DESDE_DATAFORGE, null, null, txtPalabra.getText().trim());
+        Lanzador text = Lanzador.textAnalyzer(siguienteId + 1, OrigenEntrada.DESDE_DATAFORGE, null, null, txtPalabraPipe.getText().trim());
 
         prime.setRedirecciones(DestinoSalida.CAPTURAR, null, DestinoSalida.CAPTURAR, null);
         text.setRedirecciones(destinoOut, ficheroOut, destinoErr, ficheroErr);
@@ -542,16 +543,18 @@ public class MainController {
         boolean verStderr = OPCION_FICHERO.equals(cmbStderr.getValue());
         boolean modoFichero = STDIN_FICHERO.equals(cmbStdin.getValue());
 
+        String tarea = cmbTarea.getValue();
+        boolean esPipeline = PIPELINE.equals(tarea);
+
         mostrar(txtArchivoStdout, verStdout);
         mostrar(txtArchivoStderr, verStderr);
 
         // Panel 2: en modo fichero se pide la ruta; en modo stdin, el texto a enviar
-        mostrar(cajaFichero, modoFichero);
+        mostrar(cajaFichero, modoFichero && !esPipeline );
         mostrar(cajaTextoStdin, !modoFichero);
 
-        // Límite N: solo con Prime Benchmark y stdin "Desde la aplicación"
-        boolean esTextAnalyzer = TEXT_ANALYZER.equals(cmbTarea.getValue());
-        mostrar(configPrimeBenchmark, !esTextAnalyzer && !modoFichero);
+        // Limite N: solo con Prime Benchmark y stdin "Desde la aplicacion"
+        mostrar(configPrimeBenchmark, PRIME_BENCHMARK.equals(tarea) && !modoFichero);
     }
 
     private void actualizarTarea(String tarea) {
@@ -560,14 +563,22 @@ public class MainController {
         boolean esPipe = PIPELINE.equals(tarea);
 
         //Panel 2: solo la configuracion de la tarea elegida
+
         mostrar(configTextAnalyzer, esTextAnalyzer);
         mostrar(configPrimeBenchmark, esPrime);
         mostrar(configPipe, esPipe);
 
+        // El Pipeline se lanza una sola vez: sin número de procesos ni modo secuencial/paralelo.
+        //Aqui javi configurara la GUI.
+
+
         if (esTextAnalyzer) {
             lblDescripcion.setText("Analiza un fichero de texto y devuelve estadísticas por la salida estándar.");
-        } else {
+        } else if (esPrime) {
             lblDescripcion.setText("Calcula los números primos hasta N y mide el tiempo de ejecución.");
+        } else{
+            lblDescripcion.setText("La salida de Prime Benchmark pasa por una tubería a Text Analyzer, " +
+                    "que la analiza y busca la palabra indicada.");
         }
 
         actualizarArchivos();
