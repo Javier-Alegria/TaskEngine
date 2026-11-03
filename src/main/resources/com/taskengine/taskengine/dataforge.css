@@ -22,11 +22,11 @@
 }
 
 .root.noche {
-    -color-fondo: #1F2937;
-    -color-superficie: #374151;
-    -color-suave: #4B5563;
+    -color-fondo: #1b1b1e;
+    -color-superficie: #262d32;
+    -color-suave: #1e2025;
     -color-suave-hover: #6B7280;
-    -color-borde: #6B7280;
+    -color-borde: rgba(107, 114, 128, 0.53);
     -color-borde-fuerte: #6B7280;
     -color-borde-hover: #9CA3AF;
     -color-texto: #F3F4F6;
