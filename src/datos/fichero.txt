@@ -1,6 +1,6 @@
-hola
-que tal
-tal
-tal
-Isra que
-azrael que
+--- Resultado del análisis ---
+Líneas: 4
+Palabras: 4
+Caracteres: 20
+Palabra más larga: palabra
+Apariciones de 'palabra': 2
