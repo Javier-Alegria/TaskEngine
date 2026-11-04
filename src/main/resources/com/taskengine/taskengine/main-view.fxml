@@ -112,15 +112,19 @@
                         <ToggleGroup fx:id="grupoModo"/>
                     </fx:define>
                     <Label text="3. MODO DE EJECUCIÓN" styleClass="section-title"/>
-                    <Label text="Modo:" styleClass="textoAuxiliar"/>
-                    <HBox>
-                        <ToggleButton fx:id="tglSecuencial" text="SECUENCIAL" toggleGroup="$grupoModo" maxWidth="Infinity" HBox.hgrow="ALWAYS" onAction="#actualizarModoFooter"/>
-                        <ToggleButton fx:id="tglParalelo" text="PARALELO" selected="true" toggleGroup="$grupoModo" maxWidth="Infinity" HBox.hgrow="ALWAYS" onAction="#actualizarModoFooter"/>
-                    </HBox>
-                    <HBox spacing="12" alignment="CENTER_LEFT">
-                        <Label text="Número de procesos:" styleClass="textoAuxiliar"/>
-                        <Spinner fx:id="spnProcesos" min="1" max="100" initialValue="10" editable="true"/>
-                    </HBox>
+
+                    <VBox fx:id="cajaModo" spacing="10">
+                        <Label text="Modo:" styleClass="textoAuxiliar"/>
+                        <HBox>
+                            <ToggleButton fx:id="tglSecuencial" text="SECUENCIAL" toggleGroup="$grupoModo" maxWidth="Infinity" HBox.hgrow="ALWAYS" onAction="#actualizarModoFooter"/>
+                            <ToggleButton fx:id="tglParalelo" text="PARALELO" selected="true" toggleGroup="$grupoModo" maxWidth="Infinity" HBox.hgrow="ALWAYS" onAction="#actualizarModoFooter"/>
+                        </HBox>
+                        <HBox spacing="12" alignment="CENTER_LEFT">
+                            <Label text="Número de procesos:" styleClass="textoAuxiliar"/>
+                            <Spinner fx:id="spnProcesos" min="1" max="100" initialValue="10" editable="true"/>
+                        </HBox>
+                    </VBox>
+
                     <Region VBox.vgrow="ALWAYS"/>
                     <Button fx:id="btnIniciar" text="Iniciar ejecución" maxWidth="Infinity" onAction="#iniciarEjecucion"/>
                 </VBox>

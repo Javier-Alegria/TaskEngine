@@ -89,6 +89,7 @@ public class MainController {
     @FXML private ToggleButton tglParalelo;
     @FXML private Spinner<Integer> spnProcesos;
     @FXML private Button btnIniciar;
+    @FXML private VBox cajaModo;
 
     // Panel 4
     @FXML private ComboBox<String> cmbStdout;
@@ -348,7 +349,7 @@ public class MainController {
      * Comprueba que la GUI tiene los datos mínimos para la tarea elegida.
      * Solo se comprueba que los campos no estén vacíos: si el fichero no existe o N no es un número
      * válido, lo detecta el programa externo (stderr + código distinto de 0).
-     * @return null si todo está bien, o el mensaje de aviso
+     * @return null si está bien, o el mensaje de aviso
      */
     private String validarConfiguracion(String tarea){
         boolean modoFichero = STDIN_FICHERO.equals(cmbStdin.getValue());
@@ -616,6 +617,7 @@ public class MainController {
 
         // El Pipeline se lanza una sola vez: sin número de procesos ni modo secuencial/paralelo.
         //Aqui javi configurara la GUI.
+        mostrar(cajaModo, !esPipe);
 
 
         if (esTextAnalyzer) {
