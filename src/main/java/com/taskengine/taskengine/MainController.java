@@ -146,15 +146,15 @@ public class MainController {
         actualizarArchivos();
         actualizarEstadisticas();
 
-        // las constantes son la única fuente del texto
+        // las constantes son la unica fuente del texto
         cmbTarea.getItems().setAll(TEXT_ANALYZER, PRIME_BENCHMARK, PIPELINE);
         cmbTarea.setValue(TEXT_ANALYZER);
 
         cmbTarea.valueProperty().addListener((obs, anterior, nueva) -> actualizarTarea(nueva));
         actualizarTarea(cmbTarea.getValue());
 
-        // Cada 100 ms se revisan los procesos en ejecución: se lee su salida disponible
-        // y se detecta si han terminado. Así la ventana no se congela y se puede usar destroy().
+        // Cada 100 ms se revisan los procesos en ejecucion: se lee su salida disponible
+        // y se detecta si han terminado. Asi la ventana no se congela y se puede usar destroy()
         monitor = new Timeline(new KeyFrame(Duration.millis(100), e -> revisarProcesos()));
         monitor.setCycleCount(Timeline.INDEFINITE);
 
@@ -183,7 +183,6 @@ public class MainController {
 
         // No se comprueba si el fichero existe ni si N es un número valido:
         // lo detectan TextAnalyzer y PrimeBenchmark (stderr + código distinto de 0)
-
         DestinoSalida destinoOut = destinoDe(cmbStdout.getValue());
         DestinoSalida destinoErr = destinoDe(cmbStderr.getValue());
         File ficheroOut = ficheroDe(txtArchivoStdout);
@@ -342,7 +341,12 @@ public class MainController {
     }
 
     private boolean hayLoteEnCurso() {
-        return loteActual.stream().anyMatch(l -> !l.estaTerminado());
+        for (Lanzador l : loteActual) {
+            if (!l.estaTerminado()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
