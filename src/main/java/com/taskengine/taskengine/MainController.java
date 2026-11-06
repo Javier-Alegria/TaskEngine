@@ -137,6 +137,7 @@ public class MainController {
     @FXML private Label lblProcesos;
     @FXML private Label lblInicio;
 
+    private static final boolean PRUEBA_BLQUEO =true;
 
 
     @FXML
@@ -243,6 +244,15 @@ public class MainController {
             l.iniciar();
             procesosEjecutados++;
             procesosEnEjecucion++;
+
+            if (PRUEBA_BLQUEO){
+                try {
+                    l.esperarBloqueando();
+                } catch (InterruptedException e) {
+
+                }
+            }
+
             return true;
         } catch (IOException e) {
             // start() ha fallado: no hay proceso, ni PID, ni código de salida. La fila queda en ERROR.

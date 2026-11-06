@@ -75,6 +75,7 @@ public class Lanzador {
     private String errorAlLanzar;            // mensaje si start() lanzó IOException
 
 
+
     private Lanzador(int id, String tarea, String parametros, List<String> comando,
                      OrigenEntrada origenEntrada, String textoStdin) {
         this.id = id;
@@ -181,6 +182,7 @@ public class Lanzador {
         inicio = ahora();
         try {
             procesoIniciado(pb.start());
+
         } catch (IOException e) {
             noSePudoIniciar(e);
             throw e;
@@ -402,4 +404,16 @@ public class Lanzador {
     public String getStderr() { return bufferStderr.toString(StandardCharsets.UTF_8); }
     /** Mensaje si start() falló (el proceso no llegó a existir); null en otro caso. */
     public String getErrorAlLanzar() { return errorAlLanzar; }
+
+
+
+
+
+
+
+
+    /** SOLO PARA LA PRUEBA DE BLOQUEO: espera a que el hijo termine. Bloquea el hilo que lo llama. */
+    public int esperarBloqueando() throws InterruptedException {
+        return proceso.waitFor();
+    }
 }
