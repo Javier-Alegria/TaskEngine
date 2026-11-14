@@ -11,7 +11,7 @@
 - **Redirección Completa de Flujos:**
     - **`stdout` / `stderr`:** Captura en la propia aplicación, exportación directa a fichero de texto o descarte (`DISCARD`).
     - **`stdin`:** Inyección de datos desde la interfaz de la aplicación o lectura desde fichero.
-- **Pipeline de Procesos (`Pipe`):** Encadenamiento directo de salidas y entradas utilizando `ProcessBuilder.startPipeline()` (ej. *Prime Benchmark* → *Text Analyzer*).
+- **Pipeline de Procesos (`Pipe`):** Encadenamiento directo de salidas y entradas utilizando `ProcessBuilder` (ej. * stdout de Prime Benchmark* → *stdin de Text Analyzer*).
 - **Ejecución Secuencial y Paralela:** Lanzamiento masivo de instancias sin uso de hilos (exclusivamente con procesos externos) para medir límites de concurrencia del sistema.
 - **Detención Controlada:** Cancelación activa de procesos en ejecución mediante `Process.destroy()`.
 
