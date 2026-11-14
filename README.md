@@ -42,6 +42,5 @@ La aplicación está diseñada para medir la escalabilidad de la CPU comparando 
 
 - **Javier Alegría** - *Desarrollador*
 - **Israel González** - *Desarrollador*
-- **Alberto Madrid** - *Desarrollador*
 
 *Proyecto para la asignatura de Programación de Servicios y Procesos (PSP - RA1) | 2.º DAM*
