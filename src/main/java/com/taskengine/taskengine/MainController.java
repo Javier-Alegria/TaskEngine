@@ -63,7 +63,7 @@ public class MainController {
     private long inicioTiempoTotal;
     private Timeline contadorTiempoTotal;
 
-    // Comprobación periódica de los procesos (sin hilos: se ejecuta en el hilo de JavaFX)
+    // Comprobación periodica de los procesos (sin hilos: se ejecuta en el hilo de JavaFX)
     private Timeline monitor;
 
     // Panel 1
@@ -276,10 +276,10 @@ public class MainController {
     }
 
     /**
-     * Metodo encargado de lanzar cada objeto Process segun la tarea seleccionada
+     * Metodo para crear el objeto Lanzador segun la tarea seleccionada
      * @param tarea
      * @param id
-     * @return
+     * @return el objeto que otro metodo usara para lanzar el proceso
      */
     private Lanzador crearLanzador(String tarea, int id){
         OrigenEntrada entrada = STDIN_FICHERO.equals(cmbStdin.getValue())
@@ -332,7 +332,7 @@ public class MainController {
             default -> { }   // CANCELADO: no cuenta ni como finalizado ni como error
         }
 
-        // Modo secuencial: al terminar uno se lanza el siguiente (en paralelo la cola está vacía)
+        // Modo secuencial: al terminar uno se lanza el siguiente (en paralelo la cola esta vacía)
         if (!colaSecuencial.isEmpty()) {
             lanzarSiguienteSecuencial();
         }
@@ -361,9 +361,9 @@ public class MainController {
     }
 
     /**
-     * Comprueba que la GUI tiene los datos mínimos para la tarea elegida.
-     * Solo se comprueba que los campos no estén vacíos: si el fichero no existe o N no es un número
-     * válido, lo detecta el programa externo (stderr + código distinto de 0).
+     * Comprueba que la GUI tiene los datos minimos para la tarea elegida.
+     * Solo se comprueba que los campos no esten vacios: si el fichero no existe o N no es un numero
+     * válido, lo detecta el programa externo (stderr + codigo distinto de 0).
      * @return null si está bien, o el mensaje de aviso
      */
     private String validarConfiguracion(String tarea){
@@ -460,7 +460,7 @@ public class MainController {
     //                      DETENER (Process.destroy())
     // =====================================================================
 
-    /** Botón "Detener ejecución" (panel 5): detiene el proceso de la fila seleccionada. */
+    /** Boton "Detener ejecución" (panel 5): detiene el proceso de la fila seleccionada. */
     @FXML
     private void detenerEjecucion() {
         Lanzador l = tblProcesos.getSelectionModel().getSelectedItem();
@@ -474,7 +474,7 @@ public class MainController {
         }
 
         l.detener();
-        // Si estaba EJECUTANDO, el Timeline detectará en la próxima vuelta que ha terminado
+        // Si estaba EJECUTANDO, el Timeline detectará en la proxima vuelta que ha terminado
         // y lo marcará como CANCELADO. Si estaba EN_ESPERA, ya está cancelado.
         tblProcesos.refresh();
         comprobarFinDeLote();
@@ -750,18 +750,18 @@ public class MainController {
             }
         }
 
-        String resultadosTexto = "--- Resultados de ejecución ---\n" +
+        String resultadosTexto = "--- Resultados de ejecucion ---\n" +
                 "Procesos ejecutados: " + procesosEjecutados + "\n" +
                 "Procesos finalizados: " + procesosFinalizados + "\n" +
-                "Procesos en ejecución: " + procesosEnEjecucion + "\n" +
+                "Procesos en ejecucion: " + procesosEnEjecucion + "\n" +
                 "Procesos con error: " + procesosConError + "\n" +
-                "Tiempo total (Último lote): " + lblTiempoTotal.getText();
+                "Tiempo total (Ultimo lote): " + lblTiempoTotal.getText();
 
         escribirFichero(ruta, resultadosTexto);
     }
 
     /**
-     * Escribe texto en un fichero indicando la ruta (No valída si el fichero existe, solo escribe)
+     * Escribe texto en un fichero indicando la ruta (No valida si el fichero existe, solo escribe)
      * @param ruta ruta del fichero
      * @param texto texto a escribir en el fichero
      */
@@ -774,7 +774,7 @@ public class MainController {
     }
 
     // =====================================================================
-    //                       MÉTODOS AUXILIARES
+    //                       METODOS AUXILIARES
     // =====================================================================
 
     /**
@@ -795,7 +795,7 @@ public class MainController {
 
     /**
      * Borra el texto de la salida por la aplicación
-     * @param actionEvent acción evento
+     * @param actionEvent 
      */
     public void limpiarTexto(ActionEvent actionEvent) {
         Button botonPulsado = (Button) actionEvent.getSource();
@@ -810,7 +810,7 @@ public class MainController {
     // ======================  CAMBIAR TAREA (TEXT ANALYZER O BENCHMARK) ========================
 
     /**
-     * Según la configuración del panle 2, muestra una cosa u otra
+     * Segun la configuración del panle 2, muestra una cosa u otra
      * @param nodo Cada elemento individual de la interfaz gráfica
      * @param visible True si se pone visible
      */
