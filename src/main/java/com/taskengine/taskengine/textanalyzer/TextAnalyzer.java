@@ -75,10 +75,10 @@ public class TextAnalyzer {
             String contenido = linea.trim();
 
             if (!contenido.isEmpty() ){
-                for (String trozo : linea.split("\\s+") ){           // parte la linea en varios trozos usando como criterio 1 o mas espacios en blanco
+                for (String trozo : linea.split("\\s+") ){ // parte la linea en varios trozos usando como criterio 1 o mas espacios en blanco
                     palabras ++;
 
-                    String limpia = trozo.replaceAll("[^\\p{L}\\p{N}]", ""); // Eliminar cualquier caracter que no alfanumerici o numero de array (el ^ equivale a !)
+                    String limpia = trozo.replaceAll("[^\\p{L}\\p{N}]", ""); // Eliminar cualquier caracter que no sea alfanumérico o numero de array (el ^ equivale a !)
 
                     if (limpia.length() > masLarga.length()) masLarga = limpia;
                     if (limpia.equalsIgnoreCase(palabra)) apariciones ++;

@@ -137,7 +137,7 @@ public class MainController {
     @FXML private Label lblProcesos;
     @FXML private Label lblInicio;
 
-    private static final boolean PRUEBA_BLQUEO =true;
+    private static final boolean PRUEBA_BLQUEO = false;
 
 
     @FXML
@@ -245,6 +245,7 @@ public class MainController {
             procesosEjecutados++;
             procesosEnEjecucion++;
 
+            // Esto es solo para la pureba con waitFor()
             if (PRUEBA_BLQUEO){
                 try {
                     l.esperarBloqueando();
@@ -526,15 +527,19 @@ public class MainController {
     // =====================================================================
 
     public void activarDesactivarModoNoche() {
+        // Invierte el estado actual para alternar entre el modo claro y el modo noche.
         modoNoche = !modoNoche;
 
+        // Obtiene las clases CSS del botón y de la raíz de la ventana para actualizarlas.
         var clasesBoton = btnModoOscuro.getStyleClass();
         var clasesRaiz = btnModoOscuro.getScene().getRoot().getStyleClass();
 
         if (modoNoche) {
+            // Al activar el modo noche, aplica sus estilos al botón y a toda la interfaz.
             clasesBoton.add("noche-activo");
             clasesRaiz.add("noche");
         } else {
+            // Al desactivarlo, elimina esas clases y se recuperan los estilos normales.
             clasesBoton.remove("noche-activo");
             clasesRaiz.remove("noche");
         }
