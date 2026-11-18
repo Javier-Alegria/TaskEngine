@@ -282,9 +282,12 @@ public class MainController {
      * @return el objeto que otro metodo usara para lanzar el proceso
      */
     private Lanzador crearLanzador(String tarea, int id){
-        OrigenEntrada entrada = STDIN_FICHERO.equals(cmbStdin.getValue())
-                ? OrigenEntrada.FICHERO_ARGUMENTO
-                : OrigenEntrada.DESDE_DATAFORGE;
+        OrigenEntrada entrada;
+        if (cmbStdin.getValue().equals("Leer desde fichero")) {
+            entrada = OrigenEntrada.FICHERO_ARGUMENTO;   // la ruta ira como argumento
+        } else {
+            entrada = OrigenEntrada.DESDE_DATAFORGE;     // el texto ira por stdin
+        }
 
         if (PRIME_BENCHMARK.equals(tarea)) {
             return Lanzador.primeBenchmark(id,entrada,txtFichero.getText().trim(),txtLimiteN.getText().trim());
