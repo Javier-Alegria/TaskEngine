@@ -421,7 +421,7 @@ public class MainController {
         // Text Analyzer en modo stdin (solo la palabra como argumento): su stdin sera la tuberia
         Lanzador text = Lanzador.textAnalyzer(siguienteId + 1, OrigenEntrada.DESDE_DATAFORGE, null, null, txtPalabraPipe.getText().trim());
 
-        prime.setRedirecciones(DestinoSalida.CAPTURAR, null, DestinoSalida.CAPTURAR, null);
+        prime.setRedirecciones(DestinoSalida.TUBERIA, null, DestinoSalida.CAPTURAR, null);
         text.setRedirecciones(destinoOut, ficheroOut, destinoErr, ficheroErr);
 
         String error = text.validar();   // ficheros de salida, si se han elegido
