@@ -14,28 +14,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Cada objeto Lanzador representa UNA ejecución de un proceso externo (una fila del monitor).
+ * Cada objeto Lanzador representa UNA ejecución de un proceso externo (una fila del monitor)
  *
  * Responsabilidades:
  *  - Montar el comando y configurar las redirecciones del ProcessBuilder.
- *  - Lanzar el proceso con start() y guardar el Process (PID, destroy(), código de salida).
- *  - Leer stdout / stderr cuando se capturan en DataForge y guardarlos como texto.
+ *  - Lanzar el proceso con start() y guardar el Process (PID, destroy(), código de salida)
+ *  - Leer stdout / stderr cuando se capturan en TaskEngine y guardarlos como texto
  *
- * NO toca la interfaz: no conoce TextArea, TableView ni nada de JavaFX.
- * El MainController es quien lee los datos de aquí y los muestra.
+ * NO toca la interfaz: no conoce TextArea, TableView ni nada de JavaFX
+ * El MainController es quien lee los datos de aqui y los muestra
  */
 public class Lanzador {
 
     public enum DestinoSalida { CAPTURAR, FICHERO, DISCARD, TUBERIA }
 
-    /** Cómo recibe el texto TextAnalyzer. */
+    /** Como recibe el texto TextAnalyzer. */
     public enum OrigenEntrada {
         DESDE_DATAFORGE,    // stdin: DataForge escribe el texto con getOutputStream()  -> TextAnalyzer <palabra>
         FICHERO_ARGUMENTO   // modo fichero: la ruta va como argumento                  -> TextAnalyzer <ruta> <palabra>
     }
 
     public enum Estado {
-        EN_ESPERA("En espera"),     // creado pero aun sin start() (modo secuencial)
+        EN_ESPERA("En espera"),     // creado pero aun sin star() (modo secuencial)
         EJECUTANDO("Ejecutando"),
         FINALIZADO("Finalizado"),   // codigo 0
         ERROR("Error"),             // codigo distinto de 0 o fallo al lanzar
@@ -48,7 +48,7 @@ public class Lanzador {
 
     // ---------- Datos de configuracion (se conocen al crear la ejecucion) ----------
     private final int id;
-    private  String tarea;                    // no es final: el Pipeline le añade el prefijo "Pipeline"
+    private  String tarea;                    // no es final: el Pipeline le añade  "Pipeline"
     private final String parametros;          // texto que se muestra en la columna "Parametros"
     private final List<String> comando;
     private final OrigenEntrada origenEntrada;
@@ -59,7 +59,7 @@ public class Lanzador {
     private File ficheroStdout;
     private File ficheroStderr;
 
-    // ---------- Datos que cambian durante / al final de la ejecución ----------
+    // ---------- Datos que cambian durante / al final de la ejecucion ----------
     private Process proceso;
     private Estado estado = Estado.EN_ESPERA;
     private LocalTime inicio;
@@ -68,8 +68,7 @@ public class Lanzador {
     private Integer codigoSalida;
     private boolean canceladoPorUsuario = false;
 
-    // Se guardan bytes y se convierten a texto al pedirlos, para no romper caracteres como 'á'
-    // si llegan partidos entre dos lecturas.
+    // Se guardan bytes y se convierten a texto al pedirlos, para no romper caracteres como 'á' si llegan partidos entre dos lecturas
     private final ByteArrayOutputStream bufferStdout = new ByteArrayOutputStream();
     private final ByteArrayOutputStream bufferStderr = new ByteArrayOutputStream();
     private String errorAlLanzar;            // mensaje si start() lanzó IOException
@@ -87,7 +86,7 @@ public class Lanzador {
     }
 
     /**
-     * Crea una ejecución de Text Analyzer.
+     * Crea una ejecucion de Text Analyzer
      * @param ruta       solo se usa en FICHERO_ARGUMENTO
      * @param textoStdin solo se usa en DESDE_DATAFORGE
      */
@@ -107,8 +106,8 @@ public class Lanzador {
     }
 
     /**
-     * Crea una ejecución de Prime Benchmark.
-     *  - Desde la aplicación: PrimeBenchmark <N>
+     * Crea una ejecucion de Prime Benchmark
+     *  - Desde la aplicacion: PrimeBenchmark <N>
      *  - Desde fichero:       PrimeBenchmark -f <ruta>
      */
     public static Lanzador primeBenchmark(int id, OrigenEntrada entrada, String ruta, String n) {
@@ -131,8 +130,8 @@ public class Lanzador {
     /**
      * Comando base para ejecutar una clase Java del proyecto como proceso independiente:
      *   <java de esta misma JVM> -cp target/classes -D...encoding=UTF-8 <clase>
-     * - Se usa el java de la JVM actual (java.home) para que el hijo tenga la misma versión.
-     * - Se fuerza UTF-8 en stdout/stderr del hijo para que las tildes lleguen bien a la GUI.
+     * - Se usa el java de la JVM actual (java.home) para que el hijo tenga la misma version
+     * - Se fuerza UTF-8 en stdout/stderr del hijo para que las tildes lleguen bien a la GUI
      */
     private static List<String> comandoJava(Class<?> clase) {
         List<String> comando = new ArrayList<>();
@@ -145,7 +144,7 @@ public class Lanzador {
         return comando;
     }
 
-    /** Guarda qué hacer con stdout y stderr (los ficheros solo se usan en modo FICHERO). */
+    /** Guarda que hacer con stdout y stderr (los ficheros solo se usan en modo FICHERO) */
     public void setRedirecciones(DestinoSalida stdout, File ficheroStdout, DestinoSalida stderr, File ficheroStderr) {
         this.destinoStdout = stdout;
         this.ficheroStdout = ficheroStdout;
@@ -154,10 +153,10 @@ public class Lanzador {
     }
 
     /**
-     * Comprueba lo que hay que comprobar ANTES de lanzar.
-     * El fichero de entrada NO se comprueba aquí: en modo fichero lo valida TextAnalyzer,
-     * que escribe en stderr y devuelve un código distinto de 0.
-     * @return null si todo está bien, o el mensaje de error
+     * Comprueba lo que hay que comprobar ANTES de lanzar
+     * El fichero de entrada NO se comprueba aqui: en modo fichero lo valida TextAnalyzer,
+     * que escribe en stderr y devuelve un codigo distinto de 0.
+     * @return null si todo esta bien, o el mensaje de error
      */
     public String validar() {
         if (destinoStdout == DestinoSalida.FICHERO) {
@@ -190,9 +189,8 @@ public class Lanzador {
     }
 
     /**
-     * Guarda el Process recién creado y gestiona su stdin: si hay texto que enviar desde DataForge
-     * se escribe, y en cualquier caso se cierra para que el hijo reciba EOF.
-     * (En el consumidor de un Pipeline su stdin es la tubería y getOutputStream() es un stream vacío.)
+     * Guarda el Process recien creado y gestiona su stdin: si hay texto que enviar desde DataForge
+     * se escribe, y en cualquier caso se cierra para que el hijo reciba EOF
      */
     private void procesoIniciado(Process p) {
         proceso = p;
@@ -203,11 +201,11 @@ public class Lanzador {
                 os.write(textoStdin.getBytes(StandardCharsets.UTF_8));
             }
         } catch (IOException e) {
-            // El hijo puede haber terminado antes de leer: su código de salida y su stderr dirán qué pasó.
+            // El hijo puede haber terminado antes de leer: su codigo de salida y su stderr diran que pasó.
         }
     }
 
-    /** El proceso no ha llegado a existir: no hay PID ni código de salida. La fila queda en ERROR. */
+    /** El proceso no ha llegado a existir: no hay PID ni codigo de salida. La fila queda en ERROR. */
     private void noSePudoIniciar(IOException e) {
         errorAlLanzar = "No se pudo lanzar el proceso: " + e.getMessage();
         estado = Estado.ERROR;
@@ -217,30 +215,26 @@ public class Lanzador {
 
 
     /**
-     * Pipeline: lanza dos ejecuciones conectadas por una tubería con ProcessBuilder.startPipeline().
-     * El stdout de 'productor' (Prime Benchmark) se conecta con el stdin de 'consumidor' (Text Analyzer).
-     * Después, cada Lanzador sigue su proceso por separado con actualizar(): dos filas en el monitor.
+     * Pipeline: lanza dos ejecuciones conectadas por una tuberia con ProcessBuilder.startPipeline()
+     * El stdout de 'productor' (Prime Benchmark) se conecta con el stdin de 'consumidor' (Text Analyzer)
+     * Despues, cada Lanzador sigue su proceso por separado con actualizar(): dos filas en el monitor
      *
-     * Reglas de startPipeline() (si no se cumplen lanza IllegalArgumentException):
-     *  - El stdout de todos los procesos menos el último tiene que ser PIPE: será la tubería.
-     *  - El stdin de todos los procesos menos el primero tiene que ser PIPE: será la tubería.
-     *
-     * @throws IOException si no se puede lanzar alguno de los dos. Las dos filas quedan en ERROR.
+     * @throws IOException si no se puede lanzar alguno de los dos, kas dos filas quedan en ERROR
      */
     public static void iniciarPipeline(Lanzador productor, Lanzador consumidor) throws IOException {
-        productor.destinoStdout = DestinoSalida.TUBERIA;   // su salida no va a DataForge: va a la tubería
+        productor.destinoStdout = DestinoSalida.TUBERIA;   // su salida no va a DataForge: va a la tuberia
         productor.tarea = "Pipeline " + productor.tarea;
         consumidor.tarea = "Pipeline " + consumidor.tarea;
 
         ProcessBuilder pbProductor = new ProcessBuilder(productor.comando);
         ProcessBuilder pbConsumidor = new ProcessBuilder(consumidor.comando);
-        productor.configurarRedirecciones(pbProductor);    // stdout = PIPE (tubería), stderr según la GUI
-        consumidor.configurarRedirecciones(pbConsumidor);  // stdin = PIPE (tubería), stdout/stderr según la GUI
+        productor.configurarRedirecciones(pbProductor);    // stdout = PIPE (tuberia), stderr segun la GUI
+        consumidor.configurarRedirecciones(pbConsumidor);  // stdin = PIPE (tuberia), stdout/stderr segun la GUI
 
         productor.inicio = ahora();
         consumidor.inicio = productor.inicio;
         try {
-            // Arranca los dos procesos a la vez y crea la tubería entre ellos
+            // Arranca los dos procesos a la vez y crea la tuberia entre ellos
             List<Process> procesos = ProcessBuilder.startPipeline(List.of(pbProductor, pbConsumidor));
             productor.procesoIniciado(procesos.get(0));
             consumidor.procesoIniciado(procesos.get(1));
@@ -271,14 +265,14 @@ public class Lanzador {
             case FICHERO  -> pb.redirectError(ficheroStderr);
             case DISCARD  -> pb.redirectError(ProcessBuilder.Redirect.DISCARD);
         }
-        // stdin: en los dos modos es PIPE (en modo fichero se cierra nada más lanzar)
+        // stdin: en los dos modos es PIPE (en modo fichero se cierra nada mas lanzar)
         pb.redirectInput(ProcessBuilder.Redirect.PIPE);
     }
 
     /**
-     * Comprueba el proceso sin bloquear. El controlador la llama periodicamente.
-     *  - Lee lo que haya disponible en stdout/stderr (si se capturan).
-     *  - Si el proceso ha terminado, lee lo que quede, guarda codigo, fin, duracion y estado.
+     * Comprueba el proceso sin bloquear. El controlador la llama periodicamente
+     *  - Lee lo que haya disponible en stdout/stderr (si se capturan)
+     *  - Si el proceso ha terminado, lee lo que quede, guarda codigo, fin, duracion y estado
      * @return True justo en la llamada en la que se detecta que el proceso ha terminado
      */
     public boolean actualizar() {
@@ -289,7 +283,7 @@ public class Lanzador {
 
         if (proceso.isAlive()) return false;
 
-        // Ha terminado: leer lo que quede en las tuberías y registrar el final
+        // Ha terminado: leer lo que quede en las tuberias y registrar el final
         leerResto(proceso.getInputStream(), bufferStdout);
         leerResto(proceso.getErrorStream(), bufferStderr);
 
@@ -304,10 +298,9 @@ public class Lanzador {
     }
 
     /**
-     * Detiene la ejecución con Process.destroy().
-     * El cambio de estado a CANCELADO se registra en la siguiente llamada a actualizar(),
-     * cuando el proceso ya ha terminado de verdad.
-     * Si estaba EN_ESPERA (secuencial) se cancela sin llegar a lanzarse.
+     * Detiene la ejecución con Process.destroy()
+     * El cambio de estado a CANCELADO se registra en la siguiente llamada a actualizar() cuando el proceso ya ha terminado de verdad
+     * Si estaba EN_ESPERA (secuencial) se cancela sin llegar a lanzarse
      */
     public void detener() {
         if (estado == Estado.EJECUTANDO) {
@@ -318,7 +311,7 @@ public class Lanzador {
         }
     }
 
-    /** Lee solo los bytes que ya están disponibles, así read() no se queda bloqueado. */
+    /** Lee solo los bytes que ya estan disponibles, asi read() no se queda bloqueado */
     private static void leerDisponible(InputStream is, ByteArrayOutputStream destino) {
         try {
             int disponibles = is.available();
@@ -328,11 +321,11 @@ public class Lanzador {
                 if (leidos > 0) destino.write(datos, 0, leidos);
             }
         } catch (IOException e) {
-            // Tubería cerrada: no hay más que leer
+            // Tuberia cerrada: no hay mas que leer
         }
     }
 
-    /** Con el proceso ya terminado, lee hasta EOF lo que quede. */
+    /** Con el proceso ya terminado, lee hasta EOF lo que quede */
     private static void leerResto(InputStream is, ByteArrayOutputStream destino) {
         try {
             destino.write(is.readAllBytes());
@@ -342,8 +335,8 @@ public class Lanzador {
     }
 
     /**
-     * Comprueba un fichero de salida (stdout / stderr) antes de lanzar.
-     * Si no existe no es un error: redirectOutput lo crea. Sí hace falta que exista la carpeta.
+     * Comprueba un fichero de salida (stdout / stderr) antes de lanzar
+     * Si no existe no es un error: redirectOutput lo crea. Siu hace falta que exista la carpeta
      */
     public static String comprobarFicheroSalida(File f, String canal) {
         if (f == null) return "No se ha elegido fichero para " + canal;
@@ -362,8 +355,8 @@ public class Lanzador {
     }
 
     /**
-     * Primera linea de un fichero, solo para mostrarla en la columna Parametros.
-     * Si no se puede leer devuelve "?": el error ya lo cuenta PrimeBenchmark por stderr.
+     * Primera linea de un fichero, solo para mostrarla en la columna Parametros
+     * Si no se puede leer devuelve "?": el error ya lo cuenta PrimeBenchmark por stderr
      */
     private static String primeraLinea(String ruta) {
         try (BufferedReader lector = new BufferedReader(new FileReader(ruta, StandardCharsets.UTF_8))) {
@@ -380,7 +373,7 @@ public class Lanzador {
 
     // ---------------- Getters (los usa el MainController para la tabla y los paneles) ----------------
     public int getId() { return id; }
-    /** null mientras el proceso no se ha lanzado (o si no se pudo lanzar). */
+    /** null mientras el proceso no se ha lanzado (o si no se pudo lanzar) */
     public Long getPid() { return proceso != null ? proceso.pid() : null; }
     public String getTarea() { return tarea; }
     public String getParametros() { return parametros; }
@@ -398,11 +391,11 @@ public class Lanzador {
     public File getFicheroStdout() { return ficheroStdout; }
     public File getFicheroStderr() { return ficheroStderr; }
 
-    /** Texto capturado de stdout (solo tiene contenido si stdout es CAPTURAR). */
+    /** Texto capturado de stdout (solo tiene contenido si stdout es CAPTURAR) */
     public String getStdout() { return bufferStdout.toString(StandardCharsets.UTF_8); }
-    /** Texto capturado de stderr (solo tiene contenido si stderr es CAPTURAR). */
+    /** Texto capturado de stderr (solo tiene contenido si stderr es CAPTURAR) */
     public String getStderr() { return bufferStderr.toString(StandardCharsets.UTF_8); }
-    /** Mensaje si start() falló (el proceso no llegó a existir); null en otro caso. */
+    /** Mensaje si start() falló (el proceso no llegó a existir); null en otro caso */
     public String getErrorAlLanzar() { return errorAlLanzar; }
 
 
@@ -412,7 +405,7 @@ public class Lanzador {
 
 
 
-    /** SOLO PARA LA PRUEBA DE BLOQUEO: espera a que el hijo termine. Bloquea el hilo que lo llama. */
+    /** SOLO PARA LA PRUEBA DE BLOQUEO: espera a que el hijo termine Bloquea el hilo que lo llama. */
     public int esperarBloqueando() throws InterruptedException {
         return proceso.waitFor();
     }
