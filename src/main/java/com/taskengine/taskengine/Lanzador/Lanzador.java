@@ -28,14 +28,14 @@ public class Lanzador {
 
     public enum DestinoSalida { CAPTURAR, FICHERO, DISCARD, TUBERIA }
 
-    /** Cómo recibe el texto TextAnalyzer. */
+    /** Como recibe el texto TextAnalyzer. */
     public enum OrigenEntrada {
         DESDE_DATAFORGE,    // stdin: DataForge escribe el texto con getOutputStream()  -> TextAnalyzer <palabra>
         FICHERO_ARGUMENTO   // modo fichero: la ruta va como argumento                  -> TextAnalyzer <ruta> <palabra>
     }
 
     public enum Estado {
-        EN_ESPERA("En espera"),     // creado pero aun sin start() (modo secuencial)
+        EN_ESPERA("En espera"),     // creado pero aun sin star() (modo secuencial)
         EJECUTANDO("Ejecutando"),
         FINALIZADO("Finalizado"),   // codigo 0
         ERROR("Error"),             // codigo distinto de 0 o fallo al lanzar
@@ -48,7 +48,7 @@ public class Lanzador {
 
     // ---------- Datos de configuracion (se conocen al crear la ejecucion) ----------
     private final int id;
-    private  String tarea;                    // no es final: el Pipeline le añade el prefijo "Pipeline"
+    private  String tarea;                    // no es final: el Pipeline le añade  "Pipeline"
     private final String parametros;          // texto que se muestra en la columna "Parametros"
     private final List<String> comando;
     private final OrigenEntrada origenEntrada;
@@ -145,7 +145,7 @@ public class Lanzador {
         return comando;
     }
 
-    /** Guarda qué hacer con stdout y stderr (los ficheros solo se usan en modo FICHERO). */
+    /** Guarda que hacer con stdout y stderr (los ficheros solo se usan en modo FICHERO) */
     public void setRedirecciones(DestinoSalida stdout, File ficheroStdout, DestinoSalida stderr, File ficheroStderr) {
         this.destinoStdout = stdout;
         this.ficheroStdout = ficheroStdout;
@@ -221,19 +221,19 @@ public class Lanzador {
      * @throws IOException si no se puede lanzar alguno de los dos. Las dos filas quedan en ERROR
      */
     public static void iniciarPipeline(Lanzador productor, Lanzador consumidor) throws IOException {
-        productor.destinoStdout = DestinoSalida.TUBERIA;   // su salida no va a DataForge: va a la tubería
+        productor.destinoStdout = DestinoSalida.TUBERIA;   // su salida no va a DataForge: va a la tuberia
         productor.tarea = "Pipeline " + productor.tarea;
         consumidor.tarea = "Pipeline " + consumidor.tarea;
 
         ProcessBuilder pbProductor = new ProcessBuilder(productor.comando);
         ProcessBuilder pbConsumidor = new ProcessBuilder(consumidor.comando);
-        productor.configurarRedirecciones(pbProductor);    // stdout = PIPE (tubería), stderr según la GUI
-        consumidor.configurarRedirecciones(pbConsumidor);  // stdin = PIPE (tubería), stdout/stderr según la GUI
+        productor.configurarRedirecciones(pbProductor);    // stdout = PIPE (tuberia), stderr segun la GUI
+        consumidor.configurarRedirecciones(pbConsumidor);  // stdin = PIPE (tuberia), stdout/stderr segun la GUI
 
         productor.inicio = ahora();
         consumidor.inicio = productor.inicio;
         try {
-            // Arranca los dos procesos a la vez y crea la tubería entre ellos
+            // Arranca los dos procesos a la vez y crea la tuberia entre ellos
             List<Process> procesos = ProcessBuilder.startPipeline(List.of(pbProductor, pbConsumidor));
             productor.procesoIniciado(procesos.get(0));
             consumidor.procesoIniciado(procesos.get(1));
@@ -261,7 +261,7 @@ public class Lanzador {
             case FICHERO  -> pb.redirectError(ficheroStderr);
             case DISCARD  -> pb.redirectError(ProcessBuilder.Redirect.DISCARD);
         }
-        // stdin: en los dos modos es PIPE (en modo fichero se cierra nada más lanzar)
+        // stdin: en los dos modos es PIPE (en modo fichero se cierra nada mas lanzar)
         pb.redirectInput(ProcessBuilder.Redirect.PIPE);
     }
 
@@ -409,7 +409,7 @@ public class Lanzador {
 
     // ---------------- Getters (los usa el MainController para la tabla y los paneles) ----------------
     public int getId() { return id; }
-    /** null mientras el proceso no se ha lanzado (o si no se pudo lanzar). */
+    /** null mientras el proceso no se ha lanzado (o si no se pudo lanzar) */
     public Long getPid() { return proceso != null ? proceso.pid() : null; }
     public String getTarea() { return tarea; }
     public String getParametros() { return parametros; }
@@ -427,11 +427,11 @@ public class Lanzador {
     public File getFicheroStdout() { return ficheroStdout; }
     public File getFicheroStderr() { return ficheroStderr; }
 
-    /** Texto capturado de stdout (solo tiene contenido si stdout es CAPTURAR). */
+    /** Texto capturado de stdout (solo tiene contenido si stdout es CAPTURAR) */
     public String getStdout() { return bufferStdout.toString(StandardCharsets.UTF_8); }
-    /** Texto capturado de stderr (solo tiene contenido si stderr es CAPTURAR). */
+    /** Texto capturado de stderr (solo tiene contenido si stderr es CAPTURAR) */
     public String getStderr() { return bufferStderr.toString(StandardCharsets.UTF_8); }
-    /** Mensaje si start() falló (el proceso no llegó a existir); null en otro caso. */
+    /** Mensaje si start() falló (el proceso no llegó a existir); null en otro caso */
     public String getErrorAlLanzar() { return errorAlLanzar; }
 
 
@@ -441,7 +441,7 @@ public class Lanzador {
 
 
 
-    /** SOLO PARA LA PRUEBA DE BLOQUEO: espera a que el hijo termine. Bloquea el hilo que lo llama. */
+    /** SOLO PARA LA PRUEBA DE BLOQUEO: espera a que el hijo termine Bloquea el hilo que lo llama. */
     public int esperarBloqueando() throws InterruptedException {
         return proceso.waitFor();
     }

@@ -247,6 +247,7 @@ public class MainController {
             procesosEjecutados++;
             procesosEnEjecucion++;
 
+            // Esto es solo para la pureba con waitFor()
             if (PRUEBA_BLQUEO){
                 try {
                     l.esperarBloqueando();
@@ -528,15 +529,19 @@ public class MainController {
     // =====================================================================
 
     public void activarDesactivarModoNoche() {
+        // Invierte el estado actual para alternar entre el modo claro y el modo noche.
         modoNoche = !modoNoche;
 
+        // Obtiene las clases CSS del botón y de la raíz de la ventana para actualizarlas.
         var clasesBoton = btnModoOscuro.getStyleClass();
         var clasesRaiz = btnModoOscuro.getScene().getRoot().getStyleClass();
 
         if (modoNoche) {
+            // Al activar el modo noche, aplica sus estilos al botón y a toda la interfaz.
             clasesBoton.add("noche-activo");
             clasesRaiz.add("noche");
         } else {
+            // Al desactivarlo, elimina esas clases y se recuperan los estilos normales.
             clasesBoton.remove("noche-activo");
             clasesRaiz.remove("noche");
         }
@@ -749,12 +754,12 @@ public class MainController {
             }
         }
 
-        String resultadosTexto = "--- Resultados de ejecución ---\n" +
+        String resultadosTexto = "--- Resultados de ejecucion ---\n" +
                 "Procesos ejecutados: " + procesosEjecutados + "\n" +
                 "Procesos finalizados: " + procesosFinalizados + "\n" +
-                "Procesos en ejecución: " + procesosEnEjecucion + "\n" +
+                "Procesos en ejecucion: " + procesosEnEjecucion + "\n" +
                 "Procesos con error: " + procesosConError + "\n" +
-                "Tiempo total (Último lote): " + lblTiempoTotal.getText();
+                "Tiempo total (Ultimo lote): " + lblTiempoTotal.getText();
 
         escribirFichero(ruta, resultadosTexto);
     }
@@ -794,7 +799,7 @@ public class MainController {
 
     /**
      * Borra el texto de la salida por la aplicación
-     * @param actionEvent acción evento
+     * @param actionEvent 
      */
     public void limpiarTexto(ActionEvent actionEvent) {
         Button botonPulsado = (Button) actionEvent.getSource();
@@ -809,7 +814,7 @@ public class MainController {
     // ======================  CAMBIAR TAREA (TEXT ANALYZER O BENCHMARK) ========================
 
     /**
-     * Según la configuración del panle 2, muestra una cosa u otra
+     * Segun la configuración del panle 2, muestra una cosa u otra
      * @param nodo Cada elemento individual de la interfaz gráfica
      * @param visible True si se pone visible
      */
