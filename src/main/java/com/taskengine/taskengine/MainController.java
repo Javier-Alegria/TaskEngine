@@ -48,7 +48,7 @@ public class MainController {
     /** Una fila del monitor = un Lanzador = un proceso lanzado. */
     private final ObservableList<Lanzador> procesos = FXCollections.observableArrayList();
 
-    // Lote en curso (lo que se lanzó con el ultimo "Iniciar ejecución")
+    // Lote en curso (lo que se lanzo con el ultimo "Iniciar ejecución")
     private final List<Lanzador> loteActual = new ArrayList<>();
     private final Deque<Lanzador> colaSecuencial = new ArrayDeque<>();
 
@@ -126,7 +126,7 @@ public class MainController {
     @FXML private ProgressBar pgbLote;
     @FXML private Label lblPorcentaje;
 
-    // -- Botón de exportar resultados
+    // -- Boton de exportar resultados
     @FXML private Button btnExportar;
     @FXML private TextField txtFicheroExportar;
     @FXML private Button btnExaminarExportar;
@@ -182,25 +182,25 @@ public class MainController {
             return;
         }
 
-        // No se comprueba si el fichero existe ni si N es un número valido:
-        // lo detectan TextAnalyzer y PrimeBenchmark (stderr + código distinto de 0)
+        // No se comprueba si el fichero existe ni si N es un numero valido:
+        // lo detectan TextAnalyzer y PrimeBenchmark (stderr + codigo distinto de 0)
         DestinoSalida destinoOut = destinoDe(cmbStdout.getValue());
         DestinoSalida destinoErr = destinoDe(cmbStderr.getValue());
         File ficheroOut = ficheroDe(txtArchivoStdout);
         File ficheroErr = ficheroDe(txtArchivoStderr);
 
 
-        // El Pipeline va aparte: un único lanzamiento de dos procesos, sin modo secuencial/paralelo
+        // El Pipeline va aparte: un unico lanzamiento de dos procesos, sin modo secuencial/paralelo
         if (PIPELINE.equals(tarea) ) {
             lanzarPipeline(destinoOut,ficheroOut,destinoErr,ficheroErr);
             return;
         }
 
-        spnProcesos.increment(0);                   // confirma el número si se ha escrito a mano
+        spnProcesos.increment(0);                   // confirma el numero si se ha escrito a mano
         int n = spnProcesos.getValue();
         boolean paralelo = tglParalelo.isSelected();
 
-        // ---------- 2. Crear una ejecución (fila) por cada proceso ----------
+        // ---------- 2. Crear una ejecucion (fila) por cada proceso ----------
         loteActual.clear();
         colaSecuencial.clear();
         for (int i = 0; i < n; i++) {
@@ -208,7 +208,7 @@ public class MainController {
             Lanzador l = crearLanzador(tarea, siguienteId);
             l.setRedirecciones(destinoOut, ficheroOut, destinoErr, ficheroErr);
 
-            if (i == 0) {   // todas tienen la misma configuración: basta con validar la primera
+            if (i == 0) {   // todas tienen la misma configuracion: basta con validar la primera
                 String error = l.validar();
                 if (error != null) {
                     avisar(error);
@@ -221,14 +221,14 @@ public class MainController {
         procesos.addAll(loteActual);
         tblProcesos.getSelectionModel().select(loteActual.get(0));
 
-        // ---------- 3. Lanzar según el modo ----------
+        // ---------- 3. Lanzar segun el modo ----------
         iniciarContadorTiempoTotal();
         if (paralelo) {
             for (Lanzador l : loteActual) {
                 lanzar(l);                      // todos a la vez
             }
         } else {
-            colaSecuencial.addAll(loteActual);  // de uno en uno: el siguiente cuando acabe el anterior
+            colaSecuencial.addAll(loteActual);  // de uno en uno
             lanzarSiguienteSecuencial();
         }
 
@@ -238,8 +238,10 @@ public class MainController {
         tblProcesos.refresh();
     }
 
-    /** Lanza una ejecución y actualiza los contadores. @return true si el proceso se ha creado */
+    /** Lanza una ejecucion y actualiza los contadores
+     * @return true si el proceso se ha creado */
     private boolean lanzar(Lanzador l) {
+        boolean lanzado;
         try {
             l.iniciar();
             procesosEjecutados++;
@@ -253,17 +255,17 @@ public class MainController {
 
                 }
             }
-
-            return true;
+            lanzado = true;
         } catch (IOException e) {
-            // start() ha fallado: no hay proceso, ni PID, ni código de salida. La fila queda en ERROR.
+            // start() ha fallado: no hay proceso, ni PID, ni codigo de salida. La fila queda en ERROR
             procesosConError++;
             mostrarSalidas(l);
-            return false;
+            lanzado = false;
         }
+        return lanzado;
     }
 
-    /** Modo secuencial: lanza el siguiente de la cola que siga en espera. */
+    /** Modo secuencial: lanza el siguiente de la cola que siga en espera */
     private void lanzarSiguienteSecuencial() {
         while (!colaSecuencial.isEmpty()) {
             Lanzador siguiente = colaSecuencial.poll();
@@ -275,14 +277,10 @@ public class MainController {
         }
     }
 
-    /**
-     * Metodo para crear el objeto Lanzador segun la tarea seleccionada
-     * @param tarea
-     * @param id
-     * @return el objeto que otro metodo usara para lanzar el proceso
-     */
+
     private Lanzador crearLanzador(String tarea, int id){
         OrigenEntrada entrada;
+        Lanzador proceso;
         if (cmbStdin.getValue().equals("Leer desde fichero")) {
             entrada = OrigenEntrada.FICHERO_ARGUMENTO;   // la ruta ira como argumento
         } else {
@@ -290,11 +288,12 @@ public class MainController {
         }
 
         if (PRIME_BENCHMARK.equals(tarea)) {
-            return Lanzador.primeBenchmark(id,entrada,txtFichero.getText().trim(),txtLimiteN.getText().trim());
+            proceso = Lanzador.primeBenchmark(id,entrada,txtFichero.getText().trim(),txtLimiteN.getText().trim());
+        } else{
+            proceso = Lanzador.textAnalyzer(id,entrada, txtFichero.getText().trim(),
+                    txtTextoStdin.getText(),txtPalabra.getText().trim());
         }
-
-        return Lanzador.textAnalyzer(id,entrada, txtFichero.getText().trim(),
-                txtTextoStdin.getText(),txtPalabra.getText().trim());
+        return proceso;
     }
 
 
@@ -335,13 +334,13 @@ public class MainController {
             default -> { }   // CANCELADO: no cuenta ni como finalizado ni como error
         }
 
-        // Modo secuencial: al terminar uno se lanza el siguiente (en paralelo la cola esta vacía)
+        // Modo secuencial: al terminar uno se lanza el siguiente (en paralelo la cola está vacia)
         if (!colaSecuencial.isEmpty()) {
             lanzarSiguienteSecuencial();
         }
     }
 
-    /** Si todos los procesos del lote han terminado, para el Timeline y el contador. */
+    /** Si todos los procesos del lote han terminado, para el Timeline y el contador */
     private void comprobarFinDeLote() {
         long terminados = loteActual.stream().filter(Lanzador::estaTerminado).count();
         double progreso = loteActual.isEmpty() ? 0 : (double) terminados / loteActual.size();
@@ -355,52 +354,52 @@ public class MainController {
     }
 
     private boolean hayLoteEnCurso() {
+        boolean loteEnCurso = false;
         for (Lanzador l : loteActual) {
             if (!l.estaTerminado()) {
-                return true;
+                loteEnCurso = true;
             }
         }
-        return false;
+        return loteEnCurso;
     }
 
     /**
-     * Comprueba que la GUI tiene los datos minimos para la tarea elegida.
+     * Comprueba que la GUI tiene los datos minimos para la tarea elegida
      * Solo se comprueba que los campos no esten vacios: si el fichero no existe o N no es un numero
-     * válido, lo detecta el programa externo (stderr + codigo distinto de 0).
-     * @return null si está bien, o el mensaje de aviso
+     * valido, lo detecta el programa externo (stderr + codigo distinto de 0)
+     * @return null si esta bien, o el mensaje de aviso
      */
-    private String validarConfiguracion(String tarea){
+    private String validarConfiguracion(String tarea) {
+        String error = null;
         boolean modoFichero = STDIN_FICHERO.equals(cmbStdin.getValue());
         String ruta = txtFichero.getText().trim();
 
         if (TEXT_ANALYZER.equals(tarea)) {
             if (txtPalabra.getText().trim().isEmpty()) {
-                return "Escribe la palabra a buscar.";
-            }
-            if (modoFichero && ruta.isEmpty()) {
-                return "Indica el fichero de entrada (o elige stdin \"" + STDIN_APLICACION + "\").";
+                error = "Escribe la palabra a buscar.";
+            } else if (modoFichero && ruta.isEmpty()) {
+                error = "Indica el fichero de entrada (o elige stdin \"" + STDIN_APLICACION + "\")";
             }
 
         } else if (PRIME_BENCHMARK.equals(tarea)) {
             if (modoFichero) {
                 // PrimeBenchmark -f <ruta>: N se lee de la primera línea del fichero
                 if (ruta.isEmpty()) {
-                    return "Indica el fichero que contiene N (o elige stdin \"" + STDIN_APLICACION + "\").";
+                    error = "Indica el fichero que contiene N (o elige stdin \"" + STDIN_APLICACION + "\")";
                 }
             } else if (txtLimiteN.getText().trim().isEmpty()) {
                 // PrimeBenchmark <N>
-                return "Escribe el límite N.";
+                error = "Escribe el límite N.";
             }
 
         } else if (PIPELINE.equals(tarea)) {
             if (txtLimiteNPipe.getText().trim().isEmpty()) {
-                return "Escribe el límite N para Prime Benchmark.";
-            }
-            if (txtPalabraPipe.getText().trim().isEmpty()) {
-                return "Escribe la palabra que buscará Text Analyzer.";
+                error = "Escribe el limite N para Prime Benchmark";
+            } else if (txtPalabraPipe.getText().trim().isEmpty()) {
+                error = "Escribe la palabra que buscara Text Analyzer";
             }
         }
-        return null;
+        return error;
     }
 
 
@@ -409,11 +408,11 @@ public class MainController {
      *  Pipeline: UN UNICO LANZAMIENTO DE 2 PROCESOS CONECTADOS A TRAVES DE UNA TUBERIA
      *  ================================================================================
      *   Prime Benchmark <N>  --stdout--> PIPE --stdin--> Text Analyzer <palabra>
-     *    Cada proceso es un Lanzador (una fila del monitor) y el Timeline los revisa por separado.
+     *    Cada proceso es un Lanzador (una fila del monitor) y el Timeline los revisa por separado
      *  - stdout: la opcion de la GUI se aplica a Text Analyzer, que es el que da el resultado final
-     *    El stdout de Prime Benchmark siempre va a la tuberia (lo fija Lanzador.iniciarPipeline).
+     *    El stdout de Prime Benchmark siempre va a la tuberia (lo fija Lanzador.iniciarPipeline)
      *  - stderr: la opcion de la GUI se aplica a Text Analyzer. El de Prime Benchmark siempre se
-     *    captura, para poder ver en su fila por qué ha fallado el primer proceso.
+     *    captura, para poder ver en su fila por qué ha fallado el primer proceso
      */
     private void lanzarPipeline(DestinoSalida destinoOut, File ficheroOut, DestinoSalida destinoErr, File ficheroErr) {
         Lanzador prime = Lanzador.primeBenchmark(siguienteId, OrigenEntrada.DESDE_DATAFORGE, null, txtLimiteNPipe.getText().trim());
@@ -463,7 +462,7 @@ public class MainController {
     //                      DETENER (Process.destroy())
     // =====================================================================
 
-    /** Boton "Detener ejecución" (panel 5): detiene el proceso de la fila seleccionada. */
+    /** Botón "Detener ejecucion" (panel 5): detiene el proceso de la fila seleccionada */
     @FXML
     private void detenerEjecucion() {
         Lanzador l = tblProcesos.getSelectionModel().getSelectedItem();
@@ -477,8 +476,8 @@ public class MainController {
         }
 
         l.detener();
-        // Si estaba EJECUTANDO, el Timeline detectará en la proxima vuelta que ha terminado
-        // y lo marcará como CANCELADO. Si estaba EN_ESPERA, ya está cancelado.
+        // Si estaba EJECUTANDO, el Timeline detectara en la proxima vuelta que ha terminado
+        // y lo marcara como CANCELADO. Si estaba EN_ESPERA, ya esta cancelado
         tblProcesos.refresh();
         comprobarFinDeLote();
     }
@@ -488,8 +487,8 @@ public class MainController {
     // =====================================================================
 
     /**
-     * Muestra stdout y stderr de una ejecución. Solo se muestra texto si se eligió "Capturar";
-     * si se eligió fichero o descartar, se muestra un aviso (el PDF pide no inventar contenido).
+     * Muestra stdout y stderr de una ejecucion Solo se muestra texto si se eligio "Capturar";
+     * si se eligio fichero o descartar, se muestra un aviso (el PDF pide no inventar contenido)
      */
     private void mostrarSalidas(Lanzador l) {
         if (l == null) {
@@ -506,7 +505,7 @@ public class MainController {
         }
         txtStderr.setText(err);
 
-        // Bajar el scroll al final para ver lo último
+        // Bajar el scroll al final para ver lo ultimo
         txtStdout.positionCaret(txtStdout.getLength());
         txtStderr.positionCaret(txtStderr.getLength());
     }
@@ -516,17 +515,17 @@ public class MainController {
             case CAPTURAR -> capturado;
             case FICHERO -> canal + " → FICHERO: salida guardada en\n" + fichero.getAbsolutePath();
             case DISCARD -> canal + " → DISCARD: salida descartada";
-            case TUBERIA -> canal + " → TUBERÍA: salida enviada por el pipe a la entrada estándar de Text Analyzer";
+            case TUBERIA -> canal + " → TUBERIA: salida enviada por el pipe a la entrada estandar de Text Analyzer";
         };
     }
 
-    /** Muestra un mensaje de la propia aplicación (no de un proceso) en el panel stderr. */
+    /** Muestra un mensaje de la propia aplicacion (no de un proceso) en el panel stderr */
     private void avisar(String mensaje) {
         txtStderr.setText("[DataForge] " + mensaje);
     }
 
     // =====================================================================
-    //                       CONFIGURACIÓN DE LA GUI
+    //                       CONFIGURACION DE LA GUI
     // =====================================================================
 
     public void activarDesactivarModoNoche() {
@@ -549,14 +548,14 @@ public class MainController {
     }
 
     /**
-     * Botón "Examinar..." del fichero de entrada campo 2
+     * Boton "Examinar..." del fichero de entrada campo 2
      */
     public void examinarFicheroLlamada1() {
         examinarFichero(txtFichero);
     }
 
     /**
-     * Botón "Examinar..." del fichero de entrada campo 8 (Exportar resultados)
+     * Boton "Examinar..." del fichero de entrada campo 8 (Exportar resultados)
      */
     public void examinarFicheroLlamada2() {
         examinarFichero(txtFicheroExportar);
@@ -578,14 +577,15 @@ public class MainController {
     }
 
     /**
-     * Al cambiar un ComboBox de redirección. Si se elige "Guardar en fichero" para stdout/stderr,
-     * se abre un selector de archivos y se muestra la ruta completa.
+     * Al cambiar un ComboBox de redireccion. Si se elige "Guardar en fichero" para stdout/stderr,
+     * se abre un selector de archivos y se muestra la ruta completa
      */
     @FXML
     private void cambiarRedireccion(ActionEvent evento) {
         Object origen = evento.getSource();
         if (origen == cmbStdout && OPCION_FICHERO.equals(cmbStdout.getValue())) {
             elegirFicheroSalida(txtArchivoStdout, "stdout");
+
         } else if (origen == cmbStderr && OPCION_FICHERO.equals(cmbStderr.getValue())) {
             elegirFicheroSalida(txtArchivoStderr, "stderr");
         }
@@ -606,7 +606,7 @@ public class MainController {
         }
     }
 
-    /** Muestra u oculta los campos según las opciones de redirección elegidas. */
+    /** Muestra u oculta los campos segun las opciones de redireccion elegidas */
     private void actualizarArchivos() {
         boolean verStdout = OPCION_FICHERO.equals(cmbStdout.getValue());
         boolean verStderr = OPCION_FICHERO.equals(cmbStderr.getValue());
@@ -637,18 +637,17 @@ public class MainController {
         mostrar(configPrimeBenchmark, esPrime);
         mostrar(configPipe, esPipe);
 
-        // El Pipeline se lanza una sola vez: sin número de procesos ni modo secuencial/paralelo.
-        //Aqui javi configurara la GUI.
+        // El Pipeline se lanza una sola vez: sin numero de procesos ni modo secuencial/paralelo
+        //En este metodo javi configurara la GUI
         mostrar(cajaModo, !esPipe);
 
-
         if (esTextAnalyzer) {
-            lblDescripcion.setText("Analiza un fichero de texto y devuelve estadísticas por la salida estándar.");
+            lblDescripcion.setText("Analiza un fichero de texto y devuelve estadisticas por la salida estandar");
         } else if (esPrime) {
-            lblDescripcion.setText("Calcula los números primos hasta N y mide el tiempo de ejecución.");
+            lblDescripcion.setText("Calcula los numeros primos hasta N y mide el tiempo de ejecucion");
         } else{
             lblDescripcion.setText("La salida de Prime Benchmark pasa por una tubería a Text Analyzer, " +
-                    "que la analiza y busca la palabra indicada.");
+                    "que la analiza y busca la palabra indicada");
         }
 
         actualizarArchivos();
@@ -721,13 +720,14 @@ public class MainController {
     // ======================  EXPORTAR RESULTADOS BTN ========================
 
     /**
-     * Exporta los resultados de ejecución a un fichero
+     * Exporta los resultados de ejecucion a un fichero
+     * En el momento que sue cumplen algun if el metodo termina ahi
      */
     public void onExportarResultados() {
         String ruta = txtFicheroExportar.getText().trim();
 
         if (ruta.isEmpty()) {
-            avisar("La ruta está vacía");
+            avisar("La ruta esta vacia");
             return;
         }
 
@@ -745,8 +745,9 @@ public class MainController {
                 return;
             }
         } else {
-            // Comprobar que la carpeta donde se creará existe y se puede escribir en ella
+            // Comprobar que la carpeta donde se creara existe y se puede escribir en ella
             File carpeta = ficheroResultados.getAbsoluteFile().getParentFile();
+
             if (carpeta == null || !carpeta.isDirectory() || !carpeta.canWrite()) {
                 avisar("La carpeta no existe o no se puede escribir en ella");
                 return;
