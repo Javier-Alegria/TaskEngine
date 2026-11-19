@@ -76,7 +76,7 @@
                     <VBox fx:id="cajaFichero" spacing="8">
                         <Label text="Fichero de entrada:"/>
                         <HBox spacing="10">
-                            <TextField fx:id="txtFichero" promptText="C:\Ruta\del\fichero" editable="false" HBox.hgrow="ALWAYS"/>
+                            <TextField fx:id="txtFichero" promptText="C:\Ruta\del\fichero" editable="true" HBox.hgrow="ALWAYS"/>
                             <Button fx:id="btnExaminar" text="Examinar..." onAction="#examinarFicheroLlamada1"/>
                         </HBox>
                     </VBox>

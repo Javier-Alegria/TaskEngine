@@ -1,6 +1,6 @@
 --- Resultado del análisis ---
-Líneas: 4
-Palabras: 4
-Caracteres: 20
-Palabra más larga: palabra
+Líneas: 6
+Palabras: 8
+Caracteres: 48
+Palabra más larga: sdhfbgsdf
 Apariciones de 'palabra': 2

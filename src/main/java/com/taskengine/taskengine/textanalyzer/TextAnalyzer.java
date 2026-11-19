@@ -21,38 +21,39 @@ public class TextAnalyzer {
      * @param args
      * @return
      */
-    public static int ejecutar(String[] args){
-        String palabra;
-        InputStream entrada;
+    public static int ejecutar(String[] args) {
+        int codigo = OK;
+        String palabra = "";
+        InputStream entrada = null;
 
-        if (args.length == 2){ // ----> Modo Fichero
-            File file = new File(args[0]); // ruta
-            palabra = args[1]; // palabra a buscar
-
+        if (args.length == 2) {                       // Modo fichero: <ruta> <palabra>
+            palabra = args[1];
             try {
-                entrada = new FileInputStream(file);
+                entrada = new FileInputStream(new File(args[0]));
             } catch (FileNotFoundException e) {
                 System.err.println("No se pudo abrir el fichero: " + args[0]);
-                return ERROR_FICHERO;
+                codigo = ERROR_FICHERO;
             }
-        } else if (args.length == 1){ // -----> Modo stdin
+        } else if (args.length == 1) {                // Modo stdin: <palabra>
             palabra = args[0];
             entrada = System.in;
-
         } else {
             System.err.println("Uso: TextAnalyzer <ruta> <palabra>   (modo fichero)");
             System.err.println("     TextAnalyzer <palabra>          (modo stdin)");
-            return ERROR_ARGUMENTOS;
+            codigo = ERROR_ARGUMENTOS;
         }
 
-        // Try with resources para el BufferedReader que usará el metodo que tratara los datos de entrada
-        try (BufferedReader lector = new BufferedReader ( new InputStreamReader(entrada, StandardCharsets.UTF_8))){
-            analizarTexto(lector, palabra);
-            return OK;
-        } catch (IOException e) {
-            System.err.println("Error de lectura: " + e.getMessage());
-            return ERROR_LECTURA;
+        // Solo se analiza si no ha habido errores (hay de donde leer)
+        if (codigo == OK) {
+            try (BufferedReader lector = new BufferedReader(
+                    new InputStreamReader(entrada, StandardCharsets.UTF_8))) {
+                analizarTexto(lector, palabra);
+            } catch (IOException e) {
+                System.err.println("Error de lectura: " + e.getMessage());
+                codigo = ERROR_LECTURA;
+            }
         }
+        return codigo;
     }
 
 

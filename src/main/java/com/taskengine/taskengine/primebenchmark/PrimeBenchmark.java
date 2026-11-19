@@ -23,48 +23,53 @@ public class PrimeBenchmark {
      * @return código de salida
      */
     public static int ejecutar(String[] args) {
-        String texto;
+        int codigo = OK;
+        String texto = null;
+
         // TIPOS DE ENTRADA: (N como argumento | N en un fichero)
-        if (args.length == 1) { // ----> N como argumento
+        if (args.length == 1) {                                     // N como argumento
             texto = args[0];
-        } else if (args.length == 2 && args[0].equals("-f")) { // ----> N en un fichero
+        } else if (args.length == 2 && args[0].equals("-f")) {      // N en un fichero
             try (BufferedReader lector = new BufferedReader(new FileReader(args[1], StandardCharsets.UTF_8))) {
                 String linea = lector.readLine();
                 texto = (linea == null) ? "" : linea;
             } catch (FileNotFoundException e) {
                 System.err.println("No se pudo abrir el fichero: " + args[1]);
-                return ERROR_FICHERO;
+                codigo = ERROR_FICHERO;
             } catch (IOException e) {
                 System.err.println("Error de lectura: " + e.getMessage());
-                return ERROR_LECTURA;
+                codigo = ERROR_LECTURA;
             }
         } else {
             System.err.println("Uso: PrimeBenchmark <N>             (N como argumento)");
             System.err.println("     PrimeBenchmark -f <ruta>       (N en la primera línea del fichero)");
-            return ERROR_ARGUMENTOS;
+            codigo = ERROR_ARGUMENTOS;
         }
 
-        int n;
-        try {
-            n = Integer.parseInt(texto.trim());
-        } catch (NumberFormatException e) {
-            System.err.println("'" + texto + "' no es un entero válido (entre 2 y 2147483647)");
-            return ERROR_NUMERO;
+        // Convertir el texto en número
+        int n = 0;
+        if (codigo == OK) {
+            try {
+                n = Integer.parseInt(texto.trim());
+            } catch (NumberFormatException e) {
+                System.err.println("'" + texto + "' no es un entero válido (entre 2 y 2147483647)");
+                codigo = ERROR_NUMERO;
+            }
         }
 
-        // Comprueba si n es menor a 2
-        if (n < 2) {
+        // Comprobar que n es mayor o igual que 2
+        if (codigo == OK && n < 2) {
             System.err.println("Error: N debe ser mayor o igual que 2");
-            return ERROR_NUMERO;
+            codigo = ERROR_NUMERO;
         }
 
-        // Cuenta los números primos entere 2 y n
-        int totalPrimos = contarPrimos(n);
-
-        // Imprime la cantidad de primos
-        System.out.println("N: " + n);
-        System.out.println("cantidad de primos: " + totalPrimos);
-        return OK;
+        // Contar los primos entre 2 y n e imprimir el resultado
+        if (codigo == OK) {
+            int totalPrimos = contarPrimos(n);
+            System.out.println("N: " + n);
+            System.out.println("Cantidad de primos: " + totalPrimos);
+        }
+        return codigo;
     }
 
     /**
